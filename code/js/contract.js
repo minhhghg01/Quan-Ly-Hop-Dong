@@ -23,50 +23,81 @@ async function loadContracts() {
     try {
         const res = await fetch(`${API_URL}/contract`);
         if (!res.ok) throw new Error("Lỗi kết nối Server");
-        
+
         globalContracts = await res.json();
-        
-        // Logic trạng thái "Sắp hết hạn"
-        const today = new Date().toISOString().split('T')[0];
+
+        // --- LOGIC 1: CẬP NHẬT TRẠNG THÁI TỰ ĐỘNG ---
+        // Lấy ngày hiện tại theo múi giờ máy tính (tránh lỗi lệch giờ của toISOString)
+        const now = new Date();
+        const today = now.getFullYear() + '-' +
+            String(now.getMonth() + 1).padStart(2, '0') + '-' +
+            String(now.getDate()).padStart(2, '0');
+
         globalContracts.forEach(c => {
-            if (c.reminderDate && c.reminderDate <= today && 
-                c.status !== 'Hoàn thành' && c.status !== 'Hủy' && c.status !== 'Hết hạn') {
-                c.status = 'Sắp hết hạn'; 
+            // Nếu trạng thái là "Hoàn thành" hoặc "Hủy" thì bỏ qua, không tự đổi
+            if (c.status === 'Hoàn thành' || c.status === 'Hủy') return;
+
+            // 1. Kiểm tra HẾT HẠN trước (Ưu tiên cao nhất)
+            if (c.expireDate && c.expireDate < today) {
+                c.status = 'Hết hạn';
+            }
+            // 2. Nếu chưa hết hạn thì kiểm tra NHẮC NHỞ
+            else if (c.reminderDate && c.reminderDate <= today) {
+                c.status = 'Sắp hết hạn';
             }
         });
 
-        globalContracts.sort((a, b) => b.id - a.id);
-        
+        // --- LOGIC 2: SẮP XẾP ƯU TIÊN ---
+        globalContracts.sort((a, b) => {
+            // Hàm tính điểm ưu tiên (Số càng lớn càng nổi lên trên)
+            const getScore = (status) => {
+                if (status === 'Sắp hết hạn') return 3; // Nổi lên đầu
+                if (status === 'Hết hạn') return 2;     // Nổi thứ nhì
+                return 1;                               // Các cái khác nằm dưới
+            };
+
+            const scoreA = getScore(a.status);
+            const scoreB = getScore(b.status);
+
+            if (scoreA !== scoreB) {
+                return scoreB - scoreA; // Sắp xếp theo điểm (cao xếp trước)
+            } else {
+                return b.id - a.id; // Nếu cùng điểm thì cái nào mới tạo (ID lớn) xếp trước
+            }
+        });
+
+        // Gán dữ liệu vào biến lọc hiện tại
         currentFilteredData = globalContracts;
         currentPage = 1;
-        
-        // Đồng bộ Select Box với biến rowsPerPage mặc định
-        const rowSelect = document.getElementById('rows-select');
-        if(rowSelect) rowSelect.value = rowsPerPage;
 
+        // Đồng bộ Select Box
+        const rowSelect = document.getElementById('rows-select');
+        if (rowSelect) rowSelect.value = rowsPerPage;
+
+        // Render bảng
         renderContractTable();
-        setupGlobalClick(); // Ẩn context menu khi click ngoài
-        
-        // --- KÍCH HOẠT CÁC TÍNH NĂNG UX ---
-        setupMenuAutoHide(); // 1. Tự ẩn menu
-        setupTableScroll();  // 2. Back to top cho bảng
-        
+        setupGlobalClick();
+
+        // Kích hoạt UX
+        if (typeof setupMenuAutoHide === 'function') setupMenuAutoHide();
+        if (typeof setupTableScroll === 'function') setupTableScroll();
+
     } catch (e) { console.error(e); }
 }
 
 function setupGlobalClick() {
     document.addEventListener('click', () => {
         const menu = document.getElementById('context-menu');
-        if(menu) menu.style.display = 'none';
+        if (menu) menu.style.display = 'none';
     });
 }
 
 // --- 2. LOGIC TỰ ĐỘNG ẨN MENU (WINDOW SCROLL) ---
 function setupMenuAutoHide() {
-    window.onscroll = function() {
+    window.onscroll = function () {
         const menu = document.querySelector('.main-tabs');
-        const tableCard = document.querySelector('.table-responsive'); 
-        
+        const tableCard = document.querySelector('.table-responsive');
+
         if (!menu || !tableCard) return;
 
         // Lấy vị trí bảng so với đỉnh màn hình
@@ -88,7 +119,7 @@ function setupTableScroll() {
 
     if (tableContainer && btn) {
         // Lắng nghe sự kiện cuộn CỦA BẢNG
-        tableContainer.onscroll = function() {
+        tableContainer.onscroll = function () {
             // Nếu bảng cuộn xuống quá 300px thì hiện nút
             if (tableContainer.scrollTop > 300) {
                 btn.style.display = "block";
@@ -98,7 +129,7 @@ function setupTableScroll() {
         };
 
         // Khi bấm nút -> Đẩy thanh cuộn BẢNG lên 0
-        btn.onclick = function() {
+        btn.onclick = function () {
             tableContainer.scrollTo({ top: 0, behavior: 'smooth' });
         };
     }
@@ -108,13 +139,13 @@ function setupTableScroll() {
 function changeRowsPerPage() {
     const select = document.getElementById('rows-select');
     const val = select.value;
-    
+
     if (val === 'all') {
         rowsPerPage = currentFilteredData.length || 10000;
     } else {
         rowsPerPage = parseInt(val);
     }
-    
+
     currentPage = 1; // Reset về trang 1
     renderContractTable();
 }
@@ -123,7 +154,7 @@ function changeRowsPerPage() {
 function updateContractStats(data) {
     const total = data.reduce((sum, c) => sum + (c.amount || 0), 0);
     const el = document.getElementById('stat-contract');
-    if(el) el.innerText = fmt(total) + ' đ';
+    if (el) el.innerText = fmt(total) + ' đ';
 }
 
 function renderContractTable() {
@@ -146,10 +177,10 @@ function renderContractTable() {
     if (tableContainer) savedScrollTop = tableContainer.scrollTop;
 
     tbody.innerHTML = '';
-    
+
     // Update Stats & Chart theo toàn bộ dữ liệu lọc
     updateContractStats(currentFilteredData);
-    renderChart(currentFilteredData); 
+    renderChart(currentFilteredData);
     renderPagination();
 
     const today = new Date().toISOString().split('T')[0];
@@ -158,25 +189,25 @@ function renderContractTable() {
         // Tính STT thực tế (cộng dồn các trang trước)
         const realIndex = ((currentPage - 1) * (rowsPerPage === 'all' ? 0 : rowsPerPage)) + index + 1;
         const tr = document.createElement('tr');
-        
+
         // Click chuột trái -> Sửa
-        tr.onclick = function(e) { 
-            if (e.target.tagName === 'A' || e.target.closest('a')) return; 
-            editContract(c.id); 
+        tr.onclick = function (e) {
+            if (e.target.tagName === 'A' || e.target.closest('a')) return;
+            editContract(c.id);
         };
 
         // Click chuột phải -> Menu
-        tr.oncontextmenu = function(e) {
+        tr.oncontextmenu = function (e) {
             e.preventDefault();
             selectedContextId = c.id;
             const menu = document.getElementById('context-menu');
-            if(menu) {
+            if (menu) {
                 menu.style.display = 'block';
                 menu.style.left = e.pageX + 'px';
                 menu.style.top = e.pageY + 'px';
             }
         };
-        
+
         if (c.status === 'Sắp hết hạn') tr.className = 'row-reminder';
 
         let badgeClass = 'st-moi';
@@ -189,17 +220,17 @@ function renderContractTable() {
 
         let fileLink = c.image ? `<a href="/data/${c.image}" target="_blank" title="Tải file">📎</a>` : '';
         const formatDate = (d) => d ? d.split('-').reverse().join('/') : '';
-        
+
         let reminderInfo = '';
         if (c.reminderDate) {
             const isDue = (c.status === 'Sắp hết hạn');
             const icon = isDue ? '🔔' : '⏰';
-            const color = isDue ? '#d63384' : '#868e96'; 
+            const color = isDue ? '#d63384' : '#868e96';
             reminderInfo = `<br><span style="font-size:10px; color:${color}; font-weight:500;">${icon} Nhắc: ${formatDate(c.reminderDate)}</span>`;
         }
 
         let tagsHtml = '';
-        if (c.tags) c.tags.split(',').forEach(t => { if(t.trim()) tagsHtml += `<span class="tag-badge-cell">${t.trim()}</span> `; });
+        if (c.tags) c.tags.split(',').forEach(t => { if (t.trim()) tagsHtml += `<span class="tag-badge-cell">${t.trim()}</span> `; });
 
         tr.innerHTML = `
             <td>${realIndex}</td>
@@ -223,16 +254,16 @@ function renderContractTable() {
 }
 
 function renderPagination() {
-	// Cập nhật số tổng bản ghi ra giao diện
+    // Cập nhật số tổng bản ghi ra giao diện
     const lblTotal = document.getElementById('lbl-total-records');
     if (lblTotal) lblTotal.innerText = currentFilteredData.length;
-	
+
     const container = document.getElementById('pagination');
     if (!container) return;
     container.innerHTML = '';
 
     const totalPages = Math.ceil(currentFilteredData.length / rowsPerPage);
-    if (totalPages <= 1) return; 
+    if (totalPages <= 1) return;
 
     // Prev
     const btnPrev = document.createElement('button');
@@ -272,7 +303,7 @@ async function handleContextAction(action) {
 
     if (action === 'edit') {
         editContract(selectedContextId);
-    } 
+    }
     else if (action === 'duplicate') {
         // Nhân bản cũng cần mật khẩu (vì nó là thêm mới) -> Gọi saveContract sẽ tự hỏi mật khẩu
         // Ở đây chỉ cần mở form lên thôi
@@ -289,9 +320,9 @@ async function handleContextAction(action) {
         document.getElementById('form-title').innerText = "Nhân bản Hợp đồng";
         document.getElementById('modal-contract').style.display = 'flex';
     }
-    
+
     // Đã xóa phần else if (action === 'delete') ...
-    
+
     // Ẩn menu sau khi chọn
     const menu = document.getElementById('context-menu');
     if (menu) menu.style.display = 'none';
@@ -300,7 +331,7 @@ async function handleContextAction(action) {
 // --- 7. CÁC HÀM CŨ (MODAL, CHART, SAVE, FILTER...) ---
 function openModal() { resetContractForm(); document.getElementById('modal-contract').style.display = 'flex'; }
 function closeModal() { document.getElementById('modal-contract').style.display = 'none'; }
-window.onclick = function(event) { if (event.target == document.getElementById('modal-contract')) closeModal(); }
+window.onclick = function (event) { if (event.target == document.getElementById('modal-contract')) closeModal(); }
 
 function initChartYearSelect(data) {
     const yearSelect = document.getElementById('chart-year-select');
@@ -339,19 +370,19 @@ function renderChart(data) {
         data.forEach(c => { if (c.signDate) { const d = new Date(c.signDate); if (d.getFullYear() === selectedYear) values[d.getMonth()] += (c.amount || 0); } });
     }
     if (myChart) myChart.destroy();
-    myChart = new Chart(ctx, { type: 'bar', data: { labels: labels, datasets: [{ label: labelTitle, data: values, backgroundColor: barColor, borderRadius: 4, barPercentage: 0.6 }] }, options: { responsive: true, maintainAspectRatio: false, animation: { duration: 400 }, plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(context) { return new Intl.NumberFormat('vi-VN').format(context.raw) + ' đ'; } } } }, scales: { y: { beginAtZero: true, ticks: { callback: function(value) { if(value >= 1e9) return (value/1e9).toFixed(1) + ' tỷ'; if(value >= 1e6) return (value/1e6).toFixed(0) + ' tr'; return value; }, font: { size: 10 } } }, x: { ticks: { font: { size: 11 } } } } } });
+    myChart = new Chart(ctx, { type: 'bar', data: { labels: labels, datasets: [{ label: labelTitle, data: values, backgroundColor: barColor, borderRadius: 4, barPercentage: 0.6 }] }, options: { responsive: true, maintainAspectRatio: false, animation: { duration: 400 }, plugins: { legend: { display: false }, tooltip: { callbacks: { label: function (context) { return new Intl.NumberFormat('vi-VN').format(context.raw) + ' đ'; } } } }, scales: { y: { beginAtZero: true, ticks: { callback: function (value) { if (value >= 1e9) return (value / 1e9).toFixed(1) + ' tỷ'; if (value >= 1e6) return (value / 1e6).toFixed(0) + ' tr'; return value; }, font: { size: 10 } } }, x: { ticks: { font: { size: 11 } } } } } });
 }
 
 // --- 5. LƯU & SỬA HỢP ĐỒNG (CÓ MẬT KHẨU BẢO VỆ) ---
 async function saveContract() {
     // 1. Kiểm tra dữ liệu nhập
-    if(!getVal('c-title')) return alert("Vui lòng nhập tên hợp đồng!");
+    if (!getVal('c-title')) return alert("Vui lòng nhập tên hợp đồng!");
 
     // 2. YÊU CẦU MẬT KHẨU (BẢO MẬT)
     const password = prompt("🔒 YÊU CẦU BẢO MẬT\nĐể Thêm mới hoặc Sửa, vui lòng nhập mật khẩu quản trị:", "");
-    
+
     // Nếu bấm Hủy hoặc không nhập gì
-    if (password === null) return; 
+    if (password === null) return;
 
     // Kiểm tra mật khẩu (Bạn có thể đổi '123456' thành số khác)
     if (password !== '123456') {
@@ -374,14 +405,14 @@ async function saveContract() {
     formData.append('tags', getVal('c-tags'));
     formData.append('note', getVal('c-note'));
     const file = document.getElementById('c-image').files[0];
-    if(file) formData.append('image', file);
+    if (file) formData.append('image', file);
 
     const endpoint = id ? `${API_URL}/contract/update` : `${API_URL}/contract`;
     try {
         await fetch(endpoint, { method: 'POST', body: formData });
         showToast(id ? "Đã cập nhật thành công!" : "Đã thêm mới thành công!");
-        closeModal(); 
-        loadContracts(); 
+        closeModal();
+        loadContracts();
     } catch (err) { alert("Lỗi khi lưu: " + err); }
 }
 
@@ -419,7 +450,7 @@ function executeFilter() {
     const fMin = inputMin ? getRaw('f-amount-min') : null;
     const fMax = inputMax ? getRaw('f-amount-max') : null;
     const checkDateRange = (itemDate, start, end) => { if (!itemDate) return true; if (start && itemDate < start) return false; if (end && itemDate > end) return false; return true; };
-    
+
     const filtered = globalContracts.filter(c => {
         const matchTitle = (c.title || '').toLowerCase().includes(fTitle);
         const matchComp = (c.company || '').toLowerCase().includes(fCompany);
@@ -444,10 +475,10 @@ function executeFilter() {
 // --- 7. EXPORT EXCEL (TẢI VỀ MÁY KHÁCH - FILE ĐỊNH DẠNG ĐẸP) ---
 async function exportToExcel() {
     if (currentFilteredData.length === 0) return alert("Không có dữ liệu để xuất!");
-    
+
     const btn = document.querySelector('button[onclick="exportToExcel()"]');
-    if(btn) { var oldText = btn.innerText; btn.innerText = "⏳ Đang tải..."; btn.disabled = true; }
-    
+    if (btn) { var oldText = btn.innerText; btn.innerText = "⏳ Đang tải..."; btn.disabled = true; }
+
     try {
         const res = await fetch(`${API_URL}/export`, {
             method: 'POST',
@@ -459,12 +490,12 @@ async function exportToExcel() {
 
         // 1. Nhận dữ liệu BLOB
         const blob = await res.blob();
-        
+
         // 2. Tạo link tải
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        
+
         // --- SỬA LẠI TÊN FILE TẠI ĐÂY ---
         const now = new Date();
         // Lấy 2 số cuối của năm
@@ -474,23 +505,23 @@ async function exportToExcel() {
         const dd = String(now.getDate()).padStart(2, '0');
         const HH = String(now.getHours()).padStart(2, '0');
         const MM = String(now.getMinutes()).padStart(2, '0');
-        
+
         // Ghép chuỗi: DanhSachHopDong_2512300945.xlsx
-        a.download = `DanhSachHopDong_${yy}${mm}${dd}${HH}${MM}.xlsx`; 
+        a.download = `DanhSachHopDong_${yy}${mm}${dd}${HH}${MM}.xlsx`;
         // -------------------------------
 
         document.body.appendChild(a);
         a.click();
-        
+
         a.remove();
         window.URL.revokeObjectURL(url);
-        
+
         showToast("Đã tải file Excel thành công!");
 
-    } catch (err) { 
-        console.error(err); 
-        alert("Lỗi kết nối khi xuất file: " + err.message); 
-    } finally { 
-        if(btn) { btn.innerText = oldText; btn.disabled = false; } 
+    } catch (err) {
+        console.error(err);
+        alert("Lỗi kết nối khi xuất file: " + err.message);
+    } finally {
+        if (btn) { btn.innerText = oldText; btn.disabled = false; }
     }
 }

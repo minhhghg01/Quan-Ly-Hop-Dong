@@ -176,5 +176,23 @@
     "tags": "anuong",
     "image": null,
     "date": "16:38:12 31/12/2025"
+  },
+  {
+    "id": 1770994345164,
+    "title": "cướp",
+    "amount": 100000000,
+    "type": "thu",
+    "tags": "test",
+    "image": null,
+    "date": "21:52:25 13/2/2026"
+  },
+  {
+    "id": 1770994383250,
+    "title": "bi cướp",
+    "amount": 100000000,
+    "type": "chi",
+    "tags": "test",
+    "image": null,
+    "date": "21:53:03 13/2/2026"
   }
 ]
