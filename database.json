@@ -1,0 +1,180 @@
+[
+  {
+    "id": 1766133212425,
+    "title": "khoi 9",
+    "amount": 50000000,
+    "type": "chi",
+    "image": "1766133212419-KHá»I 9.xlsx",
+    "date": "15:33:32 19/12/2025"
+  },
+  {
+    "id": 1766133299395,
+    "title": "his thang 12",
+    "amount": 90000000,
+    "type": "chi",
+    "image": "1766133299388-tá»ng há»£p THCS PhÃº La.xlsx",
+    "date": "15:34:59 19/12/2025"
+  },
+  {
+    "id": 1766133373707,
+    "title": "tien thuong t12",
+    "amount": 10000000,
+    "type": "thu",
+    "image": null,
+    "date": "15:36:13 19/12/2025"
+  },
+  {
+    "id": 1766136681299,
+    "title": "his t12",
+    "amount": 5000000,
+    "type": "chi",
+    "image": null,
+    "date": "16:31:21 19/12/2025"
+  },
+  {
+    "id": 1766136994890,
+    "title": "avc",
+    "amount": 90000,
+    "type": "chi",
+    "image": "1766136994748-Tá»ng há»£p THCS Nguyá»n TrÃ£i.xlsx",
+    "date": "16:36:34 19/12/2025"
+  },
+  {
+    "id": 1704067200000,
+    "title": "Lì xì Tết 2024 (Năm ngoái)",
+    "amount": 5000000,
+    "type": "thu",
+    "image": null,
+    "date": "08:00:00 01/01/2024"
+  },
+  {
+    "id": 1727740800000,
+    "title": "Mua Laptop mới (Tháng 10 - Đầu Quý 4)",
+    "amount": 25000000,
+    "type": "chi",
+    "image": "TC_laptop.png",
+    "date": "10:30:00 01/10/2025"
+  },
+  {
+    "id": 1730419200000,
+    "title": "Lương tháng 11",
+    "amount": 30000000,
+    "type": "thu",
+    "image": null,
+    "date": "15:00:00 05/11/2025"
+  },
+  {
+    "id": 1733011200000,
+    "title": "Thưởng dự án A (Tháng 12)",
+    "amount": 10000000,
+    "type": "thu",
+    "image": "TC_thuong.jpg",
+    "date": "09:00:00 01/12/2025"
+  },
+  {
+    "id": 1734566400000,
+    "title": "Đi siêu thị BigC (Hôm qua)",
+    "amount": 2500000,
+    "type": "chi",
+    "image": "TC_hoadon_sieuthi.jpg",
+    "date": "18:30:00 19/12/2025"
+  },
+  {
+    "id": 1734652800000,
+    "title": "Đổ xăng xe ô tô (Hôm nay)",
+    "amount": 1000000,
+    "type": "chi",
+    "image": null,
+    "date": "07:15:00 20/12/2025"
+  },
+  {
+    "id": 1766197647699,
+    "title": "quỹ gốc",
+    "amount": 300000000,
+    "type": "thu",
+    "image": "TC_chuToan.rar",
+    "date": "09:27:27 20/12/2025"
+  },
+  {
+    "id": 1766197724776,
+    "title": "bonus",
+    "amount": 100000,
+    "type": "thu",
+    "image": null,
+    "date": "09:28:44 20/12/2025"
+  },
+  {
+    "id": 1766200126531,
+    "title": "minh di choi",
+    "amount": 1000000,
+    "type": "chi",
+    "image": null,
+    "date": "10:08:46 20/12/2025"
+  },
+  {
+    "id": 1766201165896,
+    "title": "cát bà",
+    "amount": 2000000,
+    "type": "chi",
+    "tags": "dulich",
+    "image": null,
+    "date": "10:26:05 20/12/2025"
+  },
+  {
+    "id": 1767081671457,
+    "title": "bút",
+    "amount": 1000000,
+    "type": [
+      "Chi",
+      "Chi"
+    ],
+    "tags": "",
+    "image": null,
+    "date": "15:01:11 30/12/2025"
+  },
+  {
+    "id": 1767153374111,
+    "title": "tét",
+    "amount": 100000,
+    "type": "chi",
+    "tags": "",
+    "image": null,
+    "date": "10:56:14 31/12/2025"
+  },
+  {
+    "id": 1767172877496,
+    "title": "thu thêm",
+    "amount": 1000000,
+    "type": "thu",
+    "tags": "",
+    "image": null,
+    "date": "16:21:17 31/12/2025"
+  },
+  {
+    "id": 1767172891842,
+    "title": "lixi",
+    "amount": 1000000,
+    "type": "thu",
+    "tags": "",
+    "image": null,
+    "date": "16:21:31 31/12/2025"
+  },
+  {
+    "id": 1767172918090,
+    "title": "cmsn",
+    "amount": 1000000,
+    "type": "chi",
+    "tags": "",
+    "image": null,
+    "date": "16:21:58 31/12/2025"
+  },
+  {
+    "id": 1767173892474,
+    "title": "abc",
+    "amount": 100000000,
+    "type": "chi",
+    "tags": "anuong",
+    "image": null,
+    "date": "16:38:12 31/12/2025"
+  }
+]

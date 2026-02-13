@@ -1,0 +1,226 @@
+/* --- 1. INPUT & FORM --- */
+.input-card {
+    background: var(--bg-card);
+    padding: 25px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid #e5e7eb;
+}
+
+.input-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+}
+.input-row { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 15px; }
+
+/* Tiện ích Grid */
+.span-2 { grid-column: span 2; }
+.span-3 { grid-column: span 3; }
+
+/* Style cho ô nhập liệu */
+input, select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background-color: #fff;
+}
+
+input:focus, select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); /* Hiệu ứng focus xịn */
+}
+
+input[type="file"] {
+    padding: 7px;
+    background-color: #f9fafb;
+}
+
+.date-group label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+    display: block;
+}
+
+/* --- 2. BUTTONS --- */
+button {
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-save {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+}
+.btn-save:hover { background-color: var(--primary-hover); box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2); }
+
+.btn-cancel {
+    background-color: #fff;
+    color: var(--text-muted);
+    border: 1px solid #d1d5db;
+    padding: 10px 20px;
+    border-radius: 6px;
+}
+.btn-cancel:hover { background-color: #f3f4f6; color: var(--text-main); }
+
+.full-width { width: 100%; }
+
+/* Nút Sửa nhỏ trong bảng */
+.btn-edit {
+    background-color: #eff6ff;
+    color: var(--primary);
+    border: 1px solid transparent;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+.btn-edit:hover {
+    background-color: var(--primary);
+    color: white;
+}
+
+/* --- 3. TABS (MAIN MENU) --- */
+.main-tabs {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 25px;
+    background: white;
+    padding: 0 25px;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    
+    /* Sticky */
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+
+    /* HIỆU ỨNG CHUYỂN ĐỘNG MƯỢT */
+    transition: transform 0.3s ease-in-out, opacity 0.3s;
+}
+
+/* KHI BỊ ẨN (Trượt lên trên và mờ đi) */
+.main-tabs.menu-hidden {
+    transform: translateY(-150%); /* Dịch chuyển lên quá tầm nhìn */
+    opacity: 0;
+    pointer-events: none; /* Không cho bấm nhầm khi đang ẩn */
+}
+
+.main-tab-btn {
+    background: none;
+    border: none;
+    padding: 20px 5px; /* Tăng chiều cao vùng bấm */
+    font-size: 15px;
+    font-weight: 600;
+    color: #6b7280; /* Màu xám nhạt */
+    border-bottom: 3px solid transparent; /* Viền dưới trong suốt */
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Khoảng cách icon và chữ */
+}
+
+.main-tab-btn:hover {
+    color: #2563eb; /* Hover màu xanh */
+    background: transparent;
+}
+
+.main-tab-btn.active {
+    color: #2563eb;       /* Active màu xanh */
+    border-bottom-color: #2563eb; /* Hiện viền dưới màu xanh */
+}
+
+/* Thêm icon giả lập bằng emoji nếu muốn, hoặc dùng font-awesome sau */
+.main-tab-btn span { font-size: 18px; }
+
+/* --- 4. TOAST (Thông báo) --- */
+.toast {
+    visibility: hidden; position: fixed; top: 20px; right: 20px;
+    background: #1f2937; color: white; padding: 12px 24px;
+    border-radius: 8px; z-index: 9999;
+    box-shadow: var(--shadow-lg);
+    border-left: 4px solid var(--success);
+    transform: translateY(-20px); transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+.toast.show { visibility: visible; transform: translateY(0); opacity: 1; }
+
+/* --- 5. NÚT BACK TO TOP --- */
+#btn-back-to-top {
+    display: none; position: fixed; bottom: 30px; right: 30px;
+    width: 45px; height: 45px; border-radius: 50%;
+    background: var(--primary); color: white; border: none;
+    box-shadow: var(--shadow-lg); z-index: 100;
+}
+#btn-back-to-top:hover { transform: translateY(-5px); background: var(--primary-hover); }
+
+/* --- 6. LIST THU CHI (Đơn giản) --- */
+.list-card { background: white; padding: 0; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-sm);}
+.list-card ul { list-style: none; padding: 0; margin: 0; }
+.list-card li {
+    padding: 15px 20px;
+    border-bottom: 1px solid #f3f4f6;
+    display: flex; justify-content: space-between; align-items: center;
+}
+.list-card li:last-child { border-bottom: none; }
+.list-card li.thu { border-left: 4px solid var(--success); }
+.list-card li.chi { border-left: 4px solid var(--danger); }
+.filter-bar-simple { padding: 15px; background: #f9fafb; border-bottom: 1px solid #eee; }
+
+/* --- 7. MODAL (POPUP) --- */
+.modal-overlay {
+    display: none; /* Mặc định ẩn */
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Nền đen mờ */
+    z-index: 2000;
+    justify-content: center; align-items: center;
+    backdrop-filter: blur(3px); /* Làm mờ nền sau */
+}
+
+.modal-content {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    width: 80%;
+    max-width: 900px; /* Độ rộng tối đa của form */
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px;
+}
+.close-btn { font-size: 24px; cursor: pointer; color: #888; }
+.close-btn:hover { color: #f00; }
+
+.modal-footer {
+    margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;
+    display: flex; justify-content: flex-end; gap: 10px;
+}
+
+/* --- 8. TOOLBAR & BUTTON MỚI --- */
+.table-card { background: white; padding: 20px; border-radius: var(--radius); }
+.toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+
+.btn-primary-icon {
+    background-color: var(--primary); color: white; border: none;
+    padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600;
+    display: flex; align-items: center; gap: 5px;
+}
+.btn-primary-icon:hover { background-color: var(--primary-hover); transform: translateY(-1px); }

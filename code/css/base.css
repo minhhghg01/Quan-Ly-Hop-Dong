@@ -1,0 +1,93 @@
+/* --- 1. KHAI BÁO BIẾN (Dễ dàng đổi màu toàn bộ web tại đây) --- */
+:root {
+    /* Màu chủ đạo */
+    --primary: #2563eb;       /* Xanh dương hiện đại */
+    --primary-hover: #1d4ed8;
+    --bg-body: #f3f4f6;       /* Xám rất nhạt làm nền */
+    --bg-card: #ffffff;
+    --text-main: #1f2937;     /* Chữ đen xám (đỡ mỏi mắt hơn đen tuyền) */
+    --text-muted: #6b7280;    /* Chữ xám nhạt */
+    
+    /* Màu trạng thái */
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --info: #3b82f6;
+
+    /* Kích thước & Bo góc */
+    --radius: 8px;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* --- 2. RESET CƠ BẢN --- */
+* { box-sizing: border-box; outline: none; }
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--bg-body);
+    color: var(--text-main);
+    margin: 0;
+    padding: 20px;
+    line-height: 1.5;
+    font-size: 14px;
+}
+
+/* --- 3. LAYOUT CHUNG --- */
+.main-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.dashboard-container {
+    margin-bottom: 25px;
+}
+
+.content-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* --- 4. STATS CARDS (Thẻ thống kê) --- */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.stat-card {
+    background: white;
+    padding: 24px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid #e5e7eb;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+.card-title {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+}
+
+.card-number {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+/* Màu riêng cho từng card */
+.stat-card.purple .card-number { color: #8b5cf6; }
+.stat-card.blue .card-number { color: #3b82f6; }
+.stat-card.green .card-number { color: #10b981; }
+.stat-card.orange .card-number { color: #f59e0b; }

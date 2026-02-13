@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Hệ Thống Quản Lý</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/table.css">
+</head>
+
+<body>
+    <div id="toast" class="toast">✅ Lưu thành công!</div>
+
+    <div class="main-wrapper">
+        <div class="main-tabs">
+            <button class="main-tab-btn" id="btn-main-contract" onclick="loadPage('contract')">
+                <span>📜</span> Quản Lý Hợp Đồng
+            </button>
+            <button class="main-tab-btn" id="btn-main-fund" onclick="loadPage('fund')">
+                <span>💰</span> Quản Lý Quỹ Phòng
+            </button>
+        </div>
+
+        <div id="app-container">
+            <div style="text-align:center; padding:50px; color:#999;">Đang tải giao diện...</div>
+        </div>
+    </div>
+
+    <button id="btn-back-to-top" onclick="scrollToTop()" title="Lên đầu trang">⬆</button>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script src="../js/utils.js"></script>
+    <script src="../js/contract.js"></script>
+    <script src="../js/fund.js"></script>
+
+    <script>
+        // Hàm nạp giao diện HTML từ file con
+        async function loadPage(pageName) {
+            // 1. Highlight nút menu
+            document.querySelectorAll('.main-tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`btn-main-${pageName}`).classList.add('active');
+
+            // 2. Tải file HTML tương ứng
+            const container = document.getElementById('app-container');
+            container.innerHTML = '<div style="text-align:center; padding:20px;">⏳ Đang tải...</div>';
+
+            try {
+                const response = await fetch(`${pageName}.html`); // Tải contract.html hoặc fund.html
+                if (!response.ok) throw new Error("Không tải được file");
+                const html = await response.text();
+
+                // 3. Nhét HTML vào khung
+                container.innerHTML = html;
+
+                // 4. Kích hoạt logic JS tương ứng
+                if (pageName === 'contract') {
+                    if (typeof loadContracts === 'function') loadContracts();
+                } else if (pageName === 'fund') {
+                    if (typeof loadTransactions === 'function') loadTransactions();
+                }
+
+                // Lưu trạng thái
+                localStorage.setItem('lastPage', pageName);
+
+            } catch (err) {
+                container.innerHTML = `<div style="color:red; text-align:center">Lỗi: ${err.message}</div>`;
+            }
+        }
+
+        // Mặc định tải trang cuối cùng hoặc contract
+        document.addEventListener("DOMContentLoaded", () => {
+            const lastPage = localStorage.getItem('lastPage') || 'contract';
+            loadPage(lastPage);
+        });
+    </script>
+</body>
+
+</html>
