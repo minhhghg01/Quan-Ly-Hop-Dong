@@ -1,7 +1,7 @@
 [
   {
     "id": 1772010397550,
-    "title": "mua ipad M3 air phục vụ triển lãm",
+    "title": "mua ipad M3 air phục vụ triển lãm 26/02",
     "amount": 17000000,
     "type": "chi",
     "tags": "mua sắm",
@@ -11,10 +11,64 @@
   {
     "id": 1772010428504,
     "title": "mua máy tính bảng samsung glx air phục vụ triển lãm",
-    "amount": 15000000,
+    "amount": 14980000,
     "type": "chi",
     "tags": "mua sắm",
     "image": null,
     "date": "16:07:08 25/2/2026"
+  },
+  {
+    "id": 1772012542908,
+    "title": "abcd",
+    "amount": 150000000,
+    "type": "thu",
+    "tags": "",
+    "image": null,
+    "date": "16:42:22 25/2/2026"
+  },
+  {
+    "id": 1772013411138,
+    "title": "bcf",
+    "amount": 1500000,
+    "type": "chi",
+    "tags": "",
+    "image": null,
+    "date": "16:56:51 25/2/2026"
+  },
+  {
+    "id": 1772013427674,
+    "title": "bi cướp",
+    "amount": 16000000,
+    "type": "chi",
+    "tags": "",
+    "image": null,
+    "date": "16:57:07 25/2/2026"
+  },
+  {
+    "id": 1772013545472,
+    "title": "demo",
+    "amount": 9000000,
+    "type": "chi",
+    "tags": "",
+    "image": null,
+    "date": "16:59:05 25/2/2026"
+  },
+  {
+    "id": 1772015363887,
+    "title": "vàng",
+    "amount": 19000000,
+    "type": "thu",
+    "tags": "",
+    "image": null,
+    "date": "17:29:23 25/2/2026"
+  },
+  {
+    "id": 1772015394855,
+    "title": "tiệc 27/02",
+    "amount": 20000000,
+    "type": "chi",
+    "tags": "",
+    "image": null,
+    "date": "17:29:54 25/2/2026"
   }
 ]

@@ -78,5 +78,125 @@
     "module": "Hợp đồng",
     "details": "Cập nhật HĐ: nhap [Trạng thái: Mới]",
     "ip": "192.168.10.8"
+  },
+  {
+    "id": 1772010974953,
+    "time": "16:16:14 25/2/2026",
+    "action": "Thêm mới",
+    "module": "Quỹ phòng",
+    "details": "[CHI] mua máy tính bảng samsung glx air phục vụ triển lãm (Copy) - Số tiền: 15.000.000 đ",
+    "ip": "192.168.10.8"
+  },
+  {
+    "id": 1772011002612,
+    "time": "16:16:42 25/2/2026",
+    "action": "Sửa",
+    "module": "Quỹ phòng",
+    "details": "Cập nhật giao dịch [ID: 1772010428504] -> mua máy tính bảng samsung glx air phục vụ triển lãm (14.980.000 đ)",
+    "ip": "192.168.10.8"
+  },
+  {
+    "id": 1772011007305,
+    "time": "16:16:47 25/2/2026",
+    "action": "Xóa",
+    "module": "Quỹ phòng",
+    "details": "Đã xóa giao dịch: mua máy tính bảng samsung glx air phục vụ triển lãm (Copy)",
+    "ip": "192.168.10.8"
+  },
+  {
+    "id": 1772011128702,
+    "time": "16:18:48 25/2/2026",
+    "action": "Sửa",
+    "module": "Quỹ phòng",
+    "details": "Cập nhật giao dịch [ID: 1772010397550] -> mua ipad M3 air phục vụ triển lãm 26/02 (17.000.000 đ)",
+    "ip": "192.168.10.8"
+  },
+  {
+    "id": 1772011500016,
+    "time": "16:25:00 25/2/2026",
+    "action": "Sửa",
+    "module": "Hợp đồng",
+    "details": "Cập nhật HĐ: pac 02/2026 [Trạng thái: Mới]",
+    "ip": "192.168.10.8"
+  },
+  {
+    "id": 1772012543029,
+    "time": "16:42:23 25/2/2026",
+    "action": "Thêm mới",
+    "module": "Quỹ phòng",
+    "details": "[CHI] abc - Số tiền: 15.000.000 đ",
+    "ip": "192.168.10.8"
+  },
+  {
+    "id": 1772013063137,
+    "time": "16:51:03 25/2/2026",
+    "action": "Sửa",
+    "module": "Quỹ phòng",
+    "details": "[Mã Quỹ: 1772012542908] Cập nhật giao dịch -> abcd (15.000.000 đ)",
+    "ip": "192.168.10.8"
+  },
+  {
+    "id": 1772013151314,
+    "time": "16:52:31 25/2/2026",
+    "action": "Sửa",
+    "module": "Quỹ phòng",
+    "details": "[ID: 1772012542908] Cập nhật giao dịch -> abcd (150.000.000 đ)",
+    "ip": "192.168.10.8"
+  },
+  {
+    "id": 1772013545499,
+    "time": "16:59:05 25/2/2026",
+    "action": "Thêm mới",
+    "module": "Quỹ phòng",
+    "details": "[CHI] demo - Số tiền: 9.000.000 đ",
+    "ip": "192.168.10.8"
+  },
+  {
+    "id": 1772013565272,
+    "time": "16:59:25 25/2/2026",
+    "action": "Thêm mới",
+    "module": "Hợp đồng",
+    "details": "Tên HĐ: demo 2 - Giá trị: 90.000.000 đ",
+    "ip": "192.168.10.8"
+  },
+  {
+    "id": 1772013660220,
+    "time": "17:01:00 25/2/2026",
+    "action": "Xóa",
+    "module": "Quỹ phòng",
+    "details": "[ID: 1772013632839] Đã xóa giao dịch -> tét",
+    "ip": "192.168.10.8"
+  },
+  {
+    "id": 1772015314861,
+    "time": "17:28:34 25/2/2026",
+    "action": "Thêm mới",
+    "module": "Hợp đồng",
+    "details": "[Mã HĐ: 1772015314780] Thêm mới HĐ -> demo 03 - Giá trị: 10.000.000 đ",
+    "ip": "192.168.10.8"
+  },
+  {
+    "id": 1772015363908,
+    "time": "17:29:23 25/2/2026",
+    "action": "Thêm mới",
+    "module": "Quỹ phòng",
+    "details": "[ID: 1772015363887] Thêm mới [THU] vàng - Số tiền: 19.000.000 đ",
+    "ip": "192.168.10.8"
+  },
+  {
+    "id": 1772015394855,
+    "time": "17:29:54 25/2/2026",
+    "action": "Thêm mới",
+    "module": "Quỹ phòng",
+    "details": "[ID: 1772015394855] Thêm mới [CHI] tiệc 27/02 - Số tiền: 20.000.000 đ",
+    "ip": "192.168.10.8"
+  },
+  {
+    "id": 1772015427431,
+    "time": "17:30:27 25/2/2026",
+    "action": "Thêm mới",
+    "module": "Hợp đồng",
+    "details": "[ID: 1772015427430] Thêm mới HĐ -> thiết bị t2 - Giá trị: 160.000.000 đ",
+    "ip": "192.168.10.8"
   }
 ]

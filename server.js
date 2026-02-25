@@ -59,8 +59,9 @@ function saveLog(action, moduleName, details, req) {
         let logs = [];
         try { logs = JSON.parse(fs.readFileSync(HISTORY_FILE)); } catch (e) { }
 
-        let ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-        if (ip.includes('::ffff:')) ip = ip.split('::ffff:')[1]; // Lọc IPv4
+        // Cập nhật lấy IP an toàn, tránh lỗi undefiend
+        let ip = req.headers['x-forwarded-for'] || (req.socket ? req.socket.remoteAddress : '') || '127.0.0.1';
+        if (ip.includes('::ffff:')) ip = ip.split('::ffff:')[1];
 
         logs.push({
             id: Date.now(),
@@ -91,26 +92,35 @@ app.get('/api/history', (req, res) => {
 
 // ================= API QUỸ PHÒNG =================
 
-// Thêm mới Quỹ
+// --- API POST THU CHI (THÊM MỚI QUỸ) ---
 app.post('/api/add', upload.single('image'), (req, res) => {
     try {
         const { title, amount, type, tags } = req.body;
-        const transactions = JSON.parse(fs.readFileSync(DB_FILE));
+        let transactions = [];
+        try { transactions = JSON.parse(fs.readFileSync(DB_FILE)); } catch (e) { }
+
+        // BẮT BUỘC PHẢI CÓ DÒNG NÀY ĐỂ TẠO BIẾN newId
+        const newId = Date.now();
 
         const newTrans = {
-            id: Date.now(),
-            title, amount: Number(amount), type, tags: tags || "",
+            id: newId, // Dùng biến newId ở đây
+            title,
+            amount: Number(amount),
+            type: type || "chi",
+            tags: tags || "",
             image: req.file ? req.file.filename : null,
             date: new Date().toLocaleString('vi-VN')
         };
         transactions.push(newTrans);
         fs.writeFileSync(DB_FILE, JSON.stringify(transactions, null, 2));
 
-        // Ghi Log
-        saveLog("Thêm mới", "Quỹ phòng", `[${type.toUpperCase()}] ${title} - Số tiền: ${new Intl.NumberFormat('vi-VN').format(amount)} đ`, req);
+        // GHI LOG MỚI (Bảo vệ lỗi type bị undefined)
+        const safeType = (type || 'chi').toUpperCase();
+        saveLog("Thêm mới", "Quỹ phòng", `[ID: ${newId}] Thêm mới [${safeType}] ${title} - Số tiền: ${new Intl.NumberFormat('vi-VN').format(Number(amount))} đ`, req);
 
         res.json({ success: true });
     } catch (error) {
+        console.error("Lỗi thêm mới quỹ:", error);
         res.status(500).json({ success: false, message: error.message });
     }
 });
@@ -133,7 +143,7 @@ app.post('/api/transaction/update', upload.single('image'), (req, res) => {
             fs.writeFileSync(DB_FILE, JSON.stringify(transactions, null, 2));
 
             // Ghi log
-            saveLog("Sửa", "Quỹ phòng", `Cập nhật giao dịch [ID: ${id}] -> ${title} (${new Intl.NumberFormat('vi-VN').format(amount)} đ)`, req);
+            saveLog("Sửa", "Quỹ phòng", `[ID: ${id}] Cập nhật giao dịch -> ${title} (${new Intl.NumberFormat('vi-VN').format(amount)} đ)`, req);
 
             res.json({ success: true });
         } else {
@@ -157,7 +167,7 @@ app.post('/api/transaction/delete', (req, res) => {
 
         // Ghi log
         const title = target ? target.title : `ID ${id}`;
-        saveLog("Xóa", "Quỹ phòng", `Đã xóa giao dịch: ${title}`, req);
+        saveLog("Xóa", "Quỹ phòng", `[ID: ${id}] Đã xóa giao dịch -> ${title}`, req);
 
         res.json({ success: true });
     } catch (error) {
@@ -168,18 +178,28 @@ app.post('/api/transaction/delete', (req, res) => {
 
 // ================= API HỢP ĐỒNG =================
 
-// Thêm mới Hợp đồng
+// --- API POST HỢP ĐỒNG (THÊM MỚI) ---
 app.post('/api/contract', upload.single('image'), (req, res) => {
     try {
         const { title, amount, tags, company, paymentDate, signDate, expireDate, reminderDate, status, note } = req.body;
-        const contracts = JSON.parse(fs.readFileSync(CONTRACT_FILE));
+        let contracts = [];
+        try { contracts = JSON.parse(fs.readFileSync(CONTRACT_FILE)); } catch (e) { }
+
+        // BẮT BUỘC PHẢI CÓ DÒNG NÀY
+        const newId = Date.now();
 
         const newContract = {
-            id: Date.now(),
-            title: title || "", company: company || "",
+            id: newId, // Dùng biến newId ở đây
+            title: title || "",
+            company: company || "",
             amount: Number(amount) || 0,
-            paymentDate: paymentDate || "", signDate: signDate || "", expireDate: expireDate || "", reminderDate: reminderDate || "",
-            status: status || "Mới", note: note || "", tags: tags || "",
+            paymentDate: paymentDate || "",
+            signDate: signDate || "",
+            expireDate: expireDate || "",
+            reminderDate: reminderDate || "",
+            status: status || "Mới",
+            note: note || "",
+            tags: tags || "",
             image: req.file ? req.file.filename : null,
             created_at: new Date().toLocaleString('vi-VN')
         };
@@ -187,11 +207,12 @@ app.post('/api/contract', upload.single('image'), (req, res) => {
         contracts.push(newContract);
         fs.writeFileSync(CONTRACT_FILE, JSON.stringify(contracts, null, 2));
 
-        // Ghi log
-        saveLog("Thêm mới", "Hợp đồng", `Tên HĐ: ${title} - Giá trị: ${new Intl.NumberFormat('vi-VN').format(amount)} đ`, req);
+        // GHI LOG MỚI
+        saveLog("Thêm mới", "Hợp đồng", `[ID: ${newId}] Thêm mới HĐ -> ${title} - Giá trị: ${new Intl.NumberFormat('vi-VN').format(Number(amount))} đ`, req);
 
         res.json({ success: true });
     } catch (error) {
+        console.error("Lỗi thêm mới hợp đồng:", error);
         res.status(500).json({ success: false, message: error.message });
     }
 });
@@ -220,7 +241,7 @@ app.post('/api/contract/update', upload.single('image'), (req, res) => {
             fs.writeFileSync(CONTRACT_FILE, JSON.stringify(contracts, null, 2));
 
             // Ghi log
-            saveLog("Sửa", "Hợp đồng", `Cập nhật HĐ: ${title} [Trạng thái: ${status}]`, req);
+            saveLog("Sửa", "Hợp đồng", `[ID: ${id}] Cập nhật HĐ -> ${title} [Trạng thái: ${status}]`, req);
 
             res.json({ success: true });
         } else {
@@ -244,7 +265,7 @@ app.post('/api/contract/delete', (req, res) => {
 
         // Ghi log
         const title = target ? target.title : `ID ${id}`;
-        saveLog("Xóa", "Hợp đồng", `Đã xóa Hợp đồng: ${title}`, req);
+        saveLog("Xóa", "Hợp đồng", `[ID: ${id}] Đã xóa HĐ -> ${title}`, req);
 
         res.json({ success: true });
     } catch (error) {
@@ -313,14 +334,14 @@ app.post('/api/export-fund', async (req, res) => {
         const workbook = new ExcelJS.Workbook();
         const worksheet = workbook.addWorksheet('Sổ Quỹ');
 
-        const totalThu = transactions.filter(t => t.type === 'Thu').reduce((sum, t) => sum + (t.amount || 0), 0);
-        const totalChi = transactions.filter(t => t.type === 'Chi').reduce((sum, t) => sum + (t.amount || 0), 0);
+        const totalThu = transactions.filter(t => (t.type || '').toLowerCase() === 'thu').reduce((sum, t) => sum + (t.amount || 0), 0);
+        const totalChi = transactions.filter(t => (t.type || '').toLowerCase() === 'chi').reduce((sum, t) => sum + (t.amount || 0), 0);
         const balance = totalThu - totalChi;
 
-        worksheet.addRow(['', 'TỔNG THU:', totalThu]).font = { bold: true, color: { argb: 'FF008000' } };
-        worksheet.addRow(['', 'TỔNG CHI:', totalChi]).font = { bold: true, color: { argb: 'FFFF0000' } };
-        worksheet.addRow(['', 'TỒN QUỸ:', balance]).font = { bold: true, size: 14, color: { argb: 'FF0000FF' } };
-        ['C1', 'C2', 'C3'].forEach(cell => { worksheet.getCell(cell).numFmt = '#,##0 "đ"'; });
+        worksheet.addRow(['', 'TỔNG THU:', '', totalThu]).font = { bold: true, color: { argb: 'FF008000' } };
+        worksheet.addRow(['', 'TỔNG CHI:', '', totalChi]).font = { bold: true, color: { argb: 'FFFF0000' } };
+        worksheet.addRow(['', 'TỒN QUỸ:', '', balance]).font = { bold: true, size: 14, color: { argb: 'FF0000FF' } };
+        ['D1', 'D2', 'D3'].forEach(cell => { worksheet.getCell(cell).numFmt = '#,##0 "đ"'; });
         worksheet.addRow([]);
 
         const headerRow = worksheet.addRow(['STT', 'Nội dung', 'Loại', 'Số tiền', 'Tags', 'Ngày ghi', 'Chứng từ']);

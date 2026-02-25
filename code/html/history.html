@@ -15,6 +15,28 @@
                         <th width="40%">Chi tiết</th>
                         <th width="15%">IP Thao tác</th>
                     </tr>
+                    <tr class="filter-row">
+                        <th></th>
+                        <th><input type="date" id="f-hist-time" onchange="filterHistory()"></th>
+                        <th>
+                            <select id="f-hist-action" onchange="filterHistory()">
+                                <option value="">Tất cả</option>
+                                <option value="thêm">Thêm</option>
+                                <option value="sửa">Sửa</option>
+                                <option value="xóa">Xóa</option>
+                            </select>
+                        </th>
+                        <th>
+                            <select id="f-hist-module" onchange="filterHistory()">
+                                <option value="">Tất cả</option>
+                                <option value="hợp đồng">Hợp đồng</option>
+                                <option value="quỹ phòng">Quỹ phòng</option>
+                            </select>
+                        </th>
+                        <th><input type="text" id="f-hist-details" onkeyup="filterHistory()"
+                                placeholder="Lọc nội dung..."></th>
+                        <th><input type="text" id="f-hist-ip" onkeyup="filterHistory()" placeholder="Lọc IP..."></th>
+                    </tr>
                 </thead>
                 <tbody id="table-history-body"></tbody>
             </table>
