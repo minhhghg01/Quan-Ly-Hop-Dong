@@ -10,7 +10,7 @@ function showToast(msg) {
     if (t) {
         t.innerText = "✅ " + msg;
         t.className = "toast show";
-        setTimeout(() => t.className = t.className.replace("show", ""), 3006);
+        setTimeout(() => t.className = t.className.replace("show", ""), 3000); // Đổi 3006 thành 3000 (3 giây) cho chuẩn
     }
 }
 
@@ -30,6 +30,31 @@ function getRaw(id) { return Number(document.getElementById(id).value.replace(/\
 function getVal(id) { return document.getElementById(id).value; }
 function setVal(id, val) { document.getElementById(id).value = val; }
 
+// =========================================================
+// --- HÀM KIỂM TRA QUYỀN (QUẢN LÝ PHIÊN BẰNG SESSION) ---
+// =========================================================
+function checkAuth() {
+    // 1. Kiểm tra xem trong phiên này đã nhập đúng pass chưa
+    if (sessionStorage.getItem('isAdminLogged') === 'true') {
+        return true; // Đã đăng nhập trong phiên -> Cho qua luôn
+    }
+
+    // 2. Nếu chưa, yêu cầu nhập mật khẩu
+    const pass = prompt("🔒 BẢO MẬT: Nhập mật khẩu quản trị (Chỉ cần nhập 1 lần cho suốt phiên làm việc):", "");
+
+    if (pass === null) return false; // Người dùng bấm Hủy
+
+    if (pass === '123456') { // Mật khẩu của bạn (có thể đổi)
+        // Lưu cờ đánh dấu đã đăng nhập vào Session của trình duyệt
+        sessionStorage.setItem('isAdminLogged', 'true');
+        showToast("🔓 Đã mở khóa phiên làm việc!");
+        return true;
+    } else {
+        alert("⛔ Mật khẩu sai! Bạn không có quyền thực hiện thao tác này.");
+        return false;
+    }
+}
+
 // Chuyển đổi Tab Lớn (Giao diện)
 function switchMainTab(tabName) {
     // Ẩn tất cả section
@@ -37,8 +62,11 @@ function switchMainTab(tabName) {
     document.querySelectorAll('.main-tab-btn').forEach(el => el.classList.remove('active'));
 
     // Hiện section được chọn
-    document.getElementById(`section-${tabName}`).classList.add('active');
-    document.getElementById(`btn-main-${tabName}`).classList.add('active');
+    const section = document.getElementById(`section-${tabName}`);
+    const btn = document.getElementById(`btn-main-${tabName}`);
+
+    if (section) section.classList.add('active');
+    if (btn) btn.classList.add('active');
 
     // Lưu trạng thái tab để F5 không bị mất
     localStorage.setItem('currentTab', tabName);
@@ -50,7 +78,6 @@ document.addEventListener("DOMContentLoaded", () => {
     switchMainTab(savedTab);
 });
 
-// ... (Code cũ giữ nguyên) ...
 
 // --- LOGIC NÚT BACK TO TOP ---
 // Lắng nghe sự kiện cuộn của toàn bộ trang
@@ -66,7 +93,7 @@ window.onscroll = function () {
     }
 };
 
-// Hàm cuộn lên đầu (Đã có hoặc thêm mới)
+// Hàm cuộn lên đầu
 function scrollToTop() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }

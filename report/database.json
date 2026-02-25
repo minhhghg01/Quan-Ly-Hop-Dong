@@ -1,1 +1,20 @@
-[]
+[
+  {
+    "id": 1772010397550,
+    "title": "mua ipad M3 air phục vụ triển lãm",
+    "amount": 17000000,
+    "type": "chi",
+    "tags": "mua sắm",
+    "image": null,
+    "date": "16:06:37 25/2/2026"
+  },
+  {
+    "id": 1772010428504,
+    "title": "mua máy tính bảng samsung glx air phục vụ triển lãm",
+    "amount": 15000000,
+    "type": "chi",
+    "tags": "mua sắm",
+    "image": null,
+    "date": "16:07:08 25/2/2026"
+  }
+]

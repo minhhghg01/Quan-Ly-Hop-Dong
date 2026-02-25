@@ -5,6 +5,7 @@
  * 2. Table Scroll Back-to-Top (Chỉ cuộn nội dung bảng)
  * 3. Custom Rows Per Page (Chọn số dòng hiển thị)
  * 4. Fix Overlay UI (Sửa lỗi nút đè nhau)
+ * 5. BẢO MẬT: Quản lý phiên bằng Session (checkAuth)
  */
 
 let globalContracts = [];
@@ -305,8 +306,6 @@ async function handleContextAction(action) {
         editContract(selectedContextId);
     }
     else if (action === 'duplicate') {
-        // Nhân bản cũng cần mật khẩu (vì nó là thêm mới) -> Gọi saveContract sẽ tự hỏi mật khẩu
-        // Ở đây chỉ cần mở form lên thôi
         resetContractForm();
         setVal('c-title', item.title + ' (Copy)');
         setVal('c-company', item.company);
@@ -320,7 +319,6 @@ async function handleContextAction(action) {
         document.getElementById('form-title').innerText = "Nhân bản Hợp đồng";
         document.getElementById('modal-contract').style.display = 'flex';
     }
-    // THÊM LẠI PHẦN XỬ LÝ XÓA
     else if (action === 'delete') {
         deleteContract(selectedContextId);
     }
@@ -332,19 +330,12 @@ async function handleContextAction(action) {
 
 // --- HÀM XÓA HỢP ĐỒNG (CÓ MẬT KHẨU) ---
 async function deleteContract(id) {
-    // 1. Hỏi xác nhận tránh bấm nhầm
     if (!confirm("⚠️ Bạn có chắc chắn muốn XÓA VĨNH VIỄN hợp đồng này không?")) return;
 
-    // 2. Hỏi mật khẩu bảo mật
-    const pass = prompt("🔒 BẢO MẬT: Nhập mật khẩu quản trị để XÓA:", "");
-    if (pass === null) return; // Nếu người dùng bấm Hủy
+    // YÊU CẦU MẬT KHẨU (SESSION)
+    if (!checkAuth()) return;
 
-    // Mật khẩu mặc định là 123456 (bạn có thể tự đổi)
-    if (pass !== '123456') {
-        return alert("⛔ Mật khẩu sai! Bạn không có quyền xóa.");
-    }
-
-    // 3. Gọi API để xóa
+    // Gọi API để xóa
     try {
         const res = await fetch(`${API_URL}/contract/delete`, {
             method: 'POST',
@@ -382,7 +373,9 @@ function initChartYearSelect(data) {
     });
     yearSelect.value = (currentVal && years.has(parseInt(currentVal))) ? currentVal : sortedYears[0];
 }
+
 function updateChartLogic() { renderChart(globalContracts); }
+
 function renderChart(data) {
     const ctx = document.getElementById('contractChart');
     if (!ctx) return;
@@ -391,6 +384,7 @@ function renderChart(data) {
     const selectedYear = parseInt(document.getElementById('chart-year-select').value);
     document.getElementById('chart-year-select').style.display = (viewMode === 'year') ? 'none' : 'block';
     let labels = [], values = [], labelTitle = '', barColor = '#8b5cf6';
+
     if (viewMode === 'year') {
         labelTitle = 'Doanh thu theo Năm'; barColor = '#3b82f6';
         const yearMap = {};
@@ -403,6 +397,7 @@ function renderChart(data) {
         labelTitle = `Doanh thu Tháng năm ${selectedYear}`; labels = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12']; values = Array(12).fill(0);
         data.forEach(c => { if (c.signDate) { const d = new Date(c.signDate); if (d.getFullYear() === selectedYear) values[d.getMonth()] += (c.amount || 0); } });
     }
+
     if (myChart) myChart.destroy();
     myChart = new Chart(ctx, { type: 'bar', data: { labels: labels, datasets: [{ label: labelTitle, data: values, backgroundColor: barColor, borderRadius: 4, barPercentage: 0.6 }] }, options: { responsive: true, maintainAspectRatio: false, animation: { duration: 400 }, plugins: { legend: { display: false }, tooltip: { callbacks: { label: function (context) { return new Intl.NumberFormat('vi-VN').format(context.raw) + ' đ'; } } } }, scales: { y: { beginAtZero: true, ticks: { callback: function (value) { if (value >= 1e9) return (value / 1e9).toFixed(1) + ' tỷ'; if (value >= 1e6) return (value / 1e6).toFixed(0) + ' tr'; return value; }, font: { size: 10 } } }, x: { ticks: { font: { size: 11 } } } } } });
 }
@@ -412,16 +407,8 @@ async function saveContract() {
     // 1. Kiểm tra dữ liệu nhập
     if (!getVal('c-title')) return alert("Vui lòng nhập tên hợp đồng!");
 
-    // 2. YÊU CẦU MẬT KHẨU (BẢO MẬT)
-    const password = prompt("🔒 YÊU CẦU BẢO MẬT\nĐể Thêm mới hoặc Sửa, vui lòng nhập mật khẩu quản trị:", "");
-
-    // Nếu bấm Hủy hoặc không nhập gì
-    if (password === null) return;
-
-    // Kiểm tra mật khẩu (Bạn có thể đổi '123456' thành số khác)
-    if (password !== '123456') {
-        return alert("⛔ SAI MẬT KHẨU! Bạn không có quyền thực hiện thao tác này.");
-    }
+    // 2. YÊU CẦU MẬT KHẨU (BẢO MẬT SESSION)
+    if (!checkAuth()) return;
 
     // 3. Nếu đúng mật khẩu thì mới chạy tiếp logic lưu
     const id = getVal('c-id');
@@ -462,6 +449,7 @@ function editContract(id) {
     document.getElementById('btn-save-contract').innerText = "Cập nhật";
     document.getElementById('modal-contract').style.display = 'flex';
 }
+
 function resetContractForm() {
     document.querySelectorAll('#form-contract input').forEach(i => i.value = '');
     document.getElementById('c-status').value = 'Mới'; setVal('c-id', '');
@@ -473,6 +461,7 @@ function filterContractTable() {
     if (filterTimeout) clearTimeout(filterTimeout);
     filterTimeout = setTimeout(() => { executeFilter(); }, 300);
 }
+
 function executeFilter() {
     const fTitle = getVal('f-title').toLowerCase();
     const fCompany = getVal('f-company').toLowerCase();
@@ -505,7 +494,6 @@ function executeFilter() {
     renderContractTable();
 }
 
-// --- 7. EXPORT EXCEL (TẢI TRỰC TIẾP) ---
 // --- 7. EXPORT EXCEL (TẢI VỀ MÁY KHÁCH - FILE ĐỊNH DẠNG ĐẸP) ---
 async function exportToExcel() {
     if (currentFilteredData.length === 0) return alert("Không có dữ liệu để xuất!");
@@ -530,19 +518,15 @@ async function exportToExcel() {
         const a = document.createElement('a');
         a.href = url;
 
-        // --- SỬA LẠI TÊN FILE TẠI ĐÂY ---
+        // --- TẠO TÊN FILE ĐẸP ---
         const now = new Date();
-        // Lấy 2 số cuối của năm
         const yy = String(now.getFullYear()).slice(-2);
-        // Tháng (tháng bắt đầu từ 0 nên phải +1)
         const mm = String(now.getMonth() + 1).padStart(2, '0');
         const dd = String(now.getDate()).padStart(2, '0');
         const HH = String(now.getHours()).padStart(2, '0');
         const MM = String(now.getMinutes()).padStart(2, '0');
 
-        // Ghép chuỗi: DanhSachHopDong_2512300945.xlsx
         a.download = `DanhSachHopDong_${yy}${mm}${dd}${HH}${MM}.xlsx`;
-        // -------------------------------
 
         document.body.appendChild(a);
         a.click();

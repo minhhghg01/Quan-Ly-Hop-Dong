@@ -22,6 +22,9 @@
             <button class="main-tab-btn" id="btn-main-fund" onclick="loadPage('fund')">
                 <span>💰</span> Quản Lý Quỹ Phòng
             </button>
+            <button class="main-tab-btn" id="btn-main-history" onclick="loadPage('history')">
+                <span>🕰️</span> Lịch Sử Hệ Thống
+            </button>
         </div>
 
         <div id="app-container">
@@ -36,6 +39,7 @@
     <script src="../js/utils.js"></script>
     <script src="../js/contract.js"></script>
     <script src="../js/fund.js"></script>
+    <script src="../js/history.js"></script>
 
     <script>
         // Hàm nạp giao diện HTML từ file con
@@ -61,6 +65,8 @@
                     if (typeof loadContracts === 'function') loadContracts();
                 } else if (pageName === 'fund') {
                     if (typeof loadTransactions === 'function') loadTransactions();
+                } else if (pageName === 'history') {
+                    if (typeof loadHistory === 'function') loadHistory();
                 }
 
                 // Lưu trạng thái

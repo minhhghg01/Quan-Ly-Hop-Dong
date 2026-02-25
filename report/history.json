@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1772010255696,
+    "time": "16:04:15 25/2/2026",
+    "action": "Thêm mới",
+    "module": "Hợp đồng",
+    "details": "Tên HĐ: his 02/2026 - Giá trị: 100.000.000 đ",
+    "ip": "192.168.10.8"
+  },
+  {
+    "id": 1772010280901,
+    "time": "16:04:40 25/2/2026",
+    "action": "Thêm mới",
+    "module": "Hợp đồng",
+    "details": "Tên HĐ: pac - Giá trị: 90.000.000 đ",
+    "ip": "192.168.10.8"
+  },
+  {
+    "id": 1772010397551,
+    "time": "16:06:37 25/2/2026",
+    "action": "Thêm mới",
+    "module": "Quỹ phòng",
+    "details": "[CHI] mua ipad M3 air phục vụ triển lãm - Số tiền: 17.000.000 đ",
+    "ip": "192.168.10.8"
+  },
+  {
+    "id": 1772010428505,
+    "time": "16:07:08 25/2/2026",
+    "action": "Thêm mới",
+    "module": "Quỹ phòng",
+    "details": "[CHI] mua máy tính bảng samsung glx air phục vụ triển lãm - Số tiền: 15.000.000 đ",
+    "ip": "192.168.10.8"
+  },
+  {
+    "id": 1772010452265,
+    "time": "16:07:32 25/2/2026",
+    "action": "Thêm mới",
+    "module": "Quỹ phòng",
+    "details": "[CHI] nhap - Số tiền: 100.000.000 đ",
+    "ip": "192.168.10.8"
+  },
+  {
+    "id": 1772010574916,
+    "time": "16:09:34 25/2/2026",
+    "action": "Sửa",
+    "module": "Hợp đồng",
+    "details": "Cập nhật HĐ: pac [Trạng thái: Mới]",
+    "ip": "192.168.10.8"
+  },
+  {
+    "id": 1772010623127,
+    "time": "16:10:23 25/2/2026",
+    "action": "Sửa",
+    "module": "Hợp đồng",
+    "details": "Cập nhật HĐ: his 02/2026 [Trạng thái: Mới]",
+    "ip": "192.168.10.8"
+  },
+  {
+    "id": 1772010653212,
+    "time": "16:10:53 25/2/2026",
+    "action": "Xóa",
+    "module": "Quỹ phòng",
+    "details": "Đã xóa giao dịch: nhap",
+    "ip": "192.168.10.29"
+  },
+  {
+    "id": 1772010710440,
+    "time": "16:11:50 25/2/2026",
+    "action": "Thêm mới",
+    "module": "Hợp đồng",
+    "details": "Tên HĐ: nhap - Giá trị: 90.000.000 đ",
+    "ip": "192.168.10.8"
+  },
+  {
+    "id": 1772010739945,
+    "time": "16:12:19 25/2/2026",
+    "action": "Sửa",
+    "module": "Hợp đồng",
+    "details": "Cập nhật HĐ: nhap [Trạng thái: Mới]",
+    "ip": "192.168.10.8"
+  }
+]

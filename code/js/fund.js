@@ -4,7 +4,7 @@
  * 1. Tính toán số dư lũy kế (Sắp xếp cũ -> mới để cộng dồn).
  * 2. Hiển thị (Sắp xếp mới -> cũ).
  * 3. Filter giống Excel.
- * 4. Modal nhập liệu & Bảo mật mật khẩu.
+ * 4. Modal nhập liệu & Bảo mật mật khẩu Session.
  */
 
 let globalTransactions = [];
@@ -23,9 +23,6 @@ async function loadTransactions() {
         let rawData = await res.json();
 
         // BƯỚC 1: Sắp xếp TĂNG DẦN theo thời gian để tính số dư
-        // Giả sử id là timestamp hoặc có trường date
-        // Nếu date là string "HH:mm:ss dd/MM/yyyy", cần parse. 
-        // Tuy nhiên ở data mẫu id là timestamp (1767172918090) nên dùng id sort cho nhanh
         rawData.sort((a, b) => a.id - b.id);
 
         // BƯỚC 2: Tính số dư lũy kế
@@ -60,7 +57,7 @@ async function loadTransactions() {
 
         renderFundTable();
 
-        // UX Features (Copy từ contract)
+        // UX Features
         setupFundGlobalClick();
         setupFundMenuAutoHide();
         setupFundTableScroll();
@@ -154,7 +151,6 @@ function renderFundTable() {
             <td style="text-align:right;" class="col-balance">${fmt(t.balanceAfter)}</td>
             <td style="text-align:center;">${imgDisplay}</td>
         `;
-        // Đã xóa thẻ <td></td> thừa ở cuối dòng trên
         tbody.appendChild(tr);
     });
 
@@ -173,7 +169,6 @@ function executeFundFilter() {
     const fDateStart = getVal('f-date-start');
     const fDateEnd = getVal('f-date-end');
 
-    // Lấy giá trị từ 2 ô input riêng biệt
     const rawMinThu = getRaw('f-min-thu');
     const rawMinChi = getRaw('f-min-chi');
     const minThu = rawMinThu ? parseFloat(rawMinThu) : null;
@@ -191,20 +186,13 @@ function executeFundFilter() {
         const matchTitle = t.title.toLowerCase().includes(fTitle);
         const matchTags = (t.tags || '').toLowerCase().includes(fTags);
 
-        // Logic lọc số tiền riêng biệt:
-        // Nếu người dùng nhập vào ô Lọc Thu: Chỉ hiện dòng Thu >= giá trị đó (ẩn dòng Chi)
-        // Nếu người dùng nhập vào ô Lọc Chi: Chỉ hiện dòng Chi >= giá trị đó (ẩn dòng Thu)
-
         let matchAmount = true;
 
         if (minThu !== null) {
-            // Nếu lọc Thu: Phải là loại 'thu' VÀ số tiền >= minThu
             if (t.type !== 'thu' || t.amount < minThu) matchAmount = false;
         }
 
         if (minChi !== null) {
-            // Nếu lọc Chi: Phải là loại 'chi' VÀ số tiền >= minChi
-            // Lưu ý: Nếu nhập cả 2 ô Thu và Chi thì sẽ không hiện gì cả (vì 1 dòng không thể vừa Thu vừa Chi)
             if (t.type !== 'chi' || t.amount < minChi) matchAmount = false;
         }
 
@@ -221,7 +209,7 @@ function executeFundFilter() {
     renderFundTable();
 }
 
-// --- 4. MODAL & SAVE (CÓ PASS) ---
+// --- 4. MODAL & SAVE (CÓ SESSION PASS) ---
 function openFundModal() {
     resetFundForm();
     document.getElementById('modal-transaction').style.display = 'flex';
@@ -247,10 +235,8 @@ async function saveTransaction() {
     const amount = getRaw('t-amount');
     if (!amount || amount <= 0) return alert("Vui lòng nhập số tiền hợp lệ!");
 
-    // --- BẢO MẬT: YÊU CẦU MẬT KHẨU ---
-    const password = prompt("🔒 YÊU CẦU BẢO MẬT\nNhập mật khẩu quản trị để Lưu:", "");
-    if (password === null) return;
-    if (password !== '123456') return alert("⛔ SAI MẬT KHẨU!");
+    // --- BẢO MẬT: KIỂM TRA PHIÊN LÀM VIỆC ---
+    if (!checkAuth()) return; // Chỉ cần 1 dòng này để check pass
 
     // Data preparation
     const id = getVal('t-id');
@@ -262,7 +248,6 @@ async function saveTransaction() {
     formData.append('type', getVal('t-type'));
     formData.append('tags', getVal('t-tags'));
 
-    // Xử lý Custom Date nếu user chọn
     const customDate = getVal('t-date-custom');
     if (customDate) {
         formData.append('date', customDate);
@@ -271,7 +256,6 @@ async function saveTransaction() {
     const file = document.getElementById('t-image').files[0];
     if (file) formData.append('image', file);
 
-    // --- ĐÃ SỬA LỖI Ở ĐÂY: Trỏ đúng API update của server ---
     const endpoint = id ? `${API_URL}/transaction/update` : `${API_URL}/add`;
 
     try {
@@ -280,7 +264,7 @@ async function saveTransaction() {
 
         showToast(id ? "Đã cập nhật thành công!" : "Đã thêm mới thành công!");
         closeFundModal();
-        loadTransactions(); // Tải lại bảng ngay lập tức
+        loadTransactions();
     } catch (err) {
         alert('Lỗi: ' + err.message);
     }
@@ -292,12 +276,9 @@ function editTransaction(id) {
 
     setVal('t-id', t.id);
     setVal('t-title', t.title);
-    setVal('t-amount', fmt(t.amount)); // fmt trả về chuỗi có dấu phẩy
+    setVal('t-amount', fmt(t.amount));
     setVal('t-type', t.type);
     setVal('t-tags', t.tags);
-
-    // Date custom (nếu muốn hiển thị lại ngày cũ vào input date-local thì cần convert phức tạp chút)
-    // Ở đây tạm bỏ qua fill date cũ vào input datetime-local
 
     document.getElementById('form-fund-title').innerText = "Sửa Giao Dịch";
     document.getElementById('btn-save-fund').innerText = "Cập nhật";
@@ -305,8 +286,6 @@ function editTransaction(id) {
 }
 
 // --- 5. UTILITIES (Auto hide menu, Scroll, Pagination) ---
-// (Copy logic tương tự contract.js nhưng đổi selector)
-
 function changeFundRowsPerPage() {
     const val = document.getElementById('rows-select-fund').value;
     if (val === 'all') rowsPerFundPage = currentFilteredFund.length || 10000;
@@ -322,11 +301,9 @@ function renderFundPagination() {
     const totalPages = Math.ceil(currentFilteredFund.length / rowsPerFundPage);
     if (totalPages <= 1) return;
 
-    // Nút Prev
     const btnPrev = createPageBtn('<', curFundPage === 1, () => { curFundPage--; renderFundTable(); });
     container.appendChild(btnPrev);
 
-    // Số trang
     for (let i = 1; i <= totalPages; i++) {
         if (i === 1 || i === totalPages || (i >= curFundPage - 1 && i <= curFundPage + 1)) {
             const btn = createPageBtn(i, false, () => { curFundPage = i; renderFundTable(); });
@@ -339,7 +316,6 @@ function renderFundPagination() {
         }
     }
 
-    // Nút Next
     const btnNext = createPageBtn('>', curFundPage === totalPages, () => { curFundPage++; renderFundTable(); });
     container.appendChild(btnNext);
 }
@@ -353,7 +329,6 @@ function createPageBtn(text, disabled, onClick) {
     return btn;
 }
 
-// Tự ẩn menu khi cuộn
 function setupFundMenuAutoHide() {
     window.onscroll = function () {
         const menu = document.querySelector('.main-tabs');
@@ -365,10 +340,9 @@ function setupFundMenuAutoHide() {
     };
 }
 
-// Back to top bảng
 function setupFundTableScroll() {
     const tableContainer = document.querySelector('.table-responsive');
-    const btn = document.getElementById("btn-back-to-top"); // Dùng chung nút back-to-top global
+    const btn = document.getElementById("btn-back-to-top");
     if (tableContainer && btn) {
         tableContainer.onscroll = function () {
             if (tableContainer.scrollTop > 300) btn.style.display = "block";
@@ -397,7 +371,6 @@ function handleFundContextAction(action) {
         document.getElementById('form-fund-title').innerText = "Nhân bản Giao dịch";
         document.getElementById('modal-transaction').style.display = 'flex';
     }
-    // --- BỔ SUNG CHỨC NĂNG XÓA ---
     else if (action === 'delete') {
         deleteFund(selectedFundId);
     }
@@ -406,19 +379,13 @@ function handleFundContextAction(action) {
     if (menu) menu.style.display = 'none';
 }
 
-// --- HÀM XÓA QUỸ (CÓ MẬT KHẨU) ---
+// --- HÀM XÓA QUỸ (CÓ MẬT KHẨU SESSION) ---
 async function deleteFund(id) {
-    // Hỏi xác nhận
     if (!confirm("⚠️ Bạn có chắc chắn muốn XÓA VĨNH VIỄN giao dịch này không?")) return;
 
-    // Yêu cầu mật khẩu
-    const pass = prompt("🔒 BẢO MẬT: Nhập mật khẩu quản trị để XÓA:", "");
-    if (pass === null) return;
-    if (pass !== '123456') {
-        return alert("⛔ Mật khẩu sai! Bạn không có quyền xóa.");
-    }
+    // YÊU CẦU MẬT KHẨU
+    if (!checkAuth()) return;
 
-    // Gọi API xóa
     try {
         const res = await fetch(`${API_URL}/transaction/delete`, {
             method: 'POST',
@@ -429,7 +396,7 @@ async function deleteFund(id) {
         if (!res.ok) throw new Error("Lỗi kết nối máy chủ");
 
         showToast("🗑️ Đã xóa giao dịch thành công!");
-        loadTransactions(); // Tải lại bảng để tính lại số dư
+        loadTransactions();
 
     } catch (err) {
         alert("Lỗi khi xóa: " + err.message);
@@ -441,11 +408,40 @@ async function exportFundToExcel() {
     const btn = document.querySelector('button[onclick="exportFundToExcel()"]');
     if (btn) { var old = btn.innerText; btn.innerText = "⏳..."; btn.disabled = true; }
 
-    // Tự tạo CSV/Excel logic hoặc gọi API export như Contract
-    // Ở đây giả lập gọi API giống contract
     try {
-        // ... (Logic tương tự contract export)
-        alert("Chức năng xuất Excel sẽ gọi API tương tự Contract");
-    } catch (e) { console.error(e); }
-    finally { if (btn) { btn.innerText = old; btn.disabled = false; } }
+        const res = await fetch(`${API_URL}/export-fund`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(currentFilteredFund)
+        });
+
+        if (!res.ok) throw new Error("Lỗi Server");
+
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+
+        const now = new Date();
+        const yy = String(now.getFullYear()).slice(-2);
+        const mm = String(now.getMonth() + 1).padStart(2, '0');
+        const dd = String(now.getDate()).padStart(2, '0');
+        const HH = String(now.getHours()).padStart(2, '0');
+        const MM = String(now.getMinutes()).padStart(2, '0');
+
+        a.download = `SoQuy_${yy}${mm}${dd}${HH}${MM}.xlsx`;
+
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+
+        showToast("Đã tải file Excel thành công!");
+
+    } catch (e) {
+        console.error(e);
+        alert("Lỗi kết nối khi xuất file: " + e.message);
+    } finally {
+        if (btn) { btn.innerText = old; btn.disabled = false; }
+    }
 }
