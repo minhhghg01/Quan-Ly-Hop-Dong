@@ -4,20 +4,22 @@
             <div class="card-title">Tổng giá trị HĐ (Theo lọc)</div>
             <div class="card-number" id="stat-contract">Đang tải...</div>
         </div>
-        
+
         <div class="stat-card" style="padding: 15px; display:flex; flex-direction:column;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                 <span class="card-title" style="margin:0;">Biểu đồ Hợp đồng</span>
-                
+
                 <div style="display:flex; gap:5px;">
-                    <select id="chart-view-mode" onchange="updateChartLogic()" style="padding:2px 5px; font-size:11px; height:25px; border-radius:4px;">
+                    <select id="chart-view-mode" onchange="updateChartLogic()"
+                        style="padding:2px 5px; font-size:11px; height:25px; border-radius:4px;">
                         <option value="year">Theo Năm</option>
                         <option value="quarter">Theo Quý</option>
                         <option value="month">Theo Tháng</option>
                     </select>
 
-                    <select id="chart-year-select" onchange="updateChartLogic()" style="padding:2px 5px; font-size:11px; height:25px; border-radius:4px; display:none;">
-                        </select>
+                    <select id="chart-year-select" onchange="updateChartLogic()"
+                        style="padding:2px 5px; font-size:11px; height:25px; border-radius:4px; display:none;">
+                    </select>
                 </div>
             </div>
 
@@ -36,7 +38,7 @@
                 <button onclick="exportToExcel()" class="btn-primary-icon" style="background-color: #10b981;">
                     📊 Xuất Excel
                 </button>
-                
+
                 <button onclick="openModal()" class="btn-primary-icon">
                     ➕ Thêm Hợp Đồng
                 </button>
@@ -51,81 +53,87 @@
                         <th width="14%">Tên HĐ</th>
                         <th width="10%">Công ty</th>
                         <th width="8%">Giá trị</th>
-                        <th width="8%">Tags</th> <th width="7%">T.Toán</th>
+                        <th width="8%">Tags</th>
+                        <th width="7%">T.Toán</th>
                         <th width="7%">Ngày Ký</th>
                         <th width="7%">Hết hạn</th>
-                        
+
                         <th width="10%">Trạng thái</th>
                         <th width="12%">Ghi chú</th>
                         <th width="4%">File</th>
                     </tr>
-                    
+
                     <tr class="filter-row">
-						<th></th>
-						<th><input type="text" id="f-title" onkeyup="filterContractTable()" placeholder="Lọc tên..."></th>
-						<th><input type="text" id="f-company" onkeyup="filterContractTable()" placeholder="Lọc Cty..."></th>
-						<th>
-							<div class="filter-group-vertical">
-								<input type="text" id="f-amount-min" placeholder="Từ..." onkeyup="formatCurrencyInput(this); filterContractTable()">
-								<input type="text" id="f-amount-max" placeholder="Đến..." onkeyup="formatCurrencyInput(this); filterContractTable()">
-							</div>
-						</th>
-						<th><input type="text" id="f-tags" onkeyup="filterContractTable()" placeholder="Lọc Tag..."></th>				
-						<th>
-							<div class="filter-group-vertical">
-								<input type="date" id="f-pay-start" onchange="filterContractTable()">
-								<input type="date" id="f-pay-end" onchange="filterContractTable()">
-							</div>
-						</th>
-						<th>
-							<div class="filter-group-vertical">
-								<input type="date" id="f-sign-start" onchange="filterContractTable()">
-								<input type="date" id="f-sign-end" onchange="filterContractTable()">
-							</div>
-						</th>
-						<th>
-							<div class="filter-group-vertical">
-								<input type="date" id="f-exp-start" onchange="filterContractTable()">
-								<input type="date" id="f-exp-end" onchange="filterContractTable()">
-							</div>
-						</th>						
-						<th>
-							<select id="f-status" onchange="filterContractTable()">
-								<option value="">Tất cả</option>
-								<option value="Mới">Mới</option>
-								<option value="Chờ thanh toán">Chờ TT</option>
-								<option value="Hoạt động">Hoạt động</option>
-								<option value="Sắp hết hạn">Sắp hết</option>
-								<option value="Hết hạn">Hết hạn</option>
-							</select>
-						</th>
-						<th><input type="text" id="f-note" onkeyup="filterContractTable()"></th>
-						<th></th>
-					</tr>
+                        <th></th>
+                        <th><input type="text" id="f-title" onkeyup="filterContractTable()" placeholder="Lọc tên...">
+                        </th>
+                        <th><input type="text" id="f-company" onkeyup="filterContractTable()" placeholder="Lọc Cty...">
+                        </th>
+                        <th>
+                            <div class="filter-group-vertical">
+                                <input type="text" id="f-amount-min" placeholder="Từ..."
+                                    onkeyup="formatCurrencyInput(this); filterContractTable()">
+                                <input type="text" id="f-amount-max" placeholder="Đến..."
+                                    onkeyup="formatCurrencyInput(this); filterContractTable()">
+                            </div>
+                        </th>
+                        <th><input type="text" id="f-tags" onkeyup="filterContractTable()" placeholder="Lọc Tag...">
+                        </th>
+                        <th>
+                            <div class="filter-group-vertical">
+                                <input type="date" id="f-pay-start" onchange="filterContractTable()">
+                                <input type="date" id="f-pay-end" onchange="filterContractTable()">
+                            </div>
+                        </th>
+                        <th>
+                            <div class="filter-group-vertical">
+                                <input type="date" id="f-sign-start" onchange="filterContractTable()">
+                                <input type="date" id="f-sign-end" onchange="filterContractTable()">
+                            </div>
+                        </th>
+                        <th>
+                            <div class="filter-group-vertical">
+                                <input type="date" id="f-exp-start" onchange="filterContractTable()">
+                                <input type="date" id="f-exp-end" onchange="filterContractTable()">
+                            </div>
+                        </th>
+                        <th>
+                            <select id="f-status" onchange="filterContractTable()">
+                                <option value="">Tất cả</option>
+                                <option value="Mới">Mới</option>
+                                <option value="Chờ thanh toán">Chờ TT</option>
+                                <option value="Hoạt động">Hoạt động</option>
+                                <option value="Sắp hết hạn">Sắp hết</option>
+                                <option value="Hết hạn">Hết hạn</option>
+                            </select>
+                        </th>
+                        <th><input type="text" id="f-note" onkeyup="filterContractTable()"></th>
+                        <th></th>
+                    </tr>
                 </thead>
                 <tbody id="table-contract-body"></tbody>
             </table>
         </div>
-		
-		<div class="pagination-wrapper">
-			<div class="rows-per-page">
-            Hiển thị: 
-            <select id="rows-select" onchange="changeRowsPerPage()">
-                <option value="20">20 dòng</option>
-                <option value="50">50 dòng</option>
-                <option value="100">100 dòng</option>
-                <option value="200">200 dòng</option>
-                <option value="all">Tất cả</option>
-            </select>
-            
-            <span style="margin-left: 8px; color: #4b5563; font-size: 13px;">
-            Tổng: <b id="lbl-total-records" style="color: #2563eb;">0</b> bản ghi
-            </span>
+
+        <div class="pagination-wrapper">
+            <div class="rows-per-page">
+                Hiển thị:
+                <select id="rows-select" onchange="changeRowsPerPage()">
+                    <option value="20">20 dòng</option>
+                    <option value="50">50 dòng</option>
+                    <option value="100">100 dòng</option>
+                    <option value="200">200 dòng</option>
+                    <option value="all">Tất cả</option>
+                </select>
+
+                <span style="margin-left: 8px; color: #4b5563; font-size: 13px;">
+                    Tổng: <b id="lbl-total-records" style="color: #2563eb;">0</b> bản ghi
+                </span>
+            </div>
+
+            <div id="pagination" class="pagination-container"></div>
         </div>
 
-			<div id="pagination" class="pagination-container"></div>
-		</div>
-		
     </div>
 </div>
 
@@ -135,13 +143,14 @@
             <h3 id="form-title">Thêm mới Hợp đồng</h3>
             <span class="close-btn" onclick="closeModal()">&times;</span>
         </div>
-        
+
         <div id="form-contract">
             <input type="hidden" id="c-id">
             <div class="input-grid">
                 <input type="text" id="c-title" placeholder="Tên hợp đồng" class="span-2">
                 <input type="text" id="c-company" placeholder="Tên công ty" class="span-2">
-                <div class="input-group-col"><input type="text" id="c-amount" placeholder="Giá trị..." onkeyup="formatCurrencyInput(this)" onkeydown="handleAmountShortcuts(event)"></div>
+                <div class="input-group-col"><input type="text" id="c-amount" placeholder="Giá trị..."
+                        onkeyup="formatCurrencyInput(this)" onkeydown="handleAmountShortcuts(event)"></div>
                 <select id="c-status">
                     <option value="Mới">Mới</option>
                     <option value="Chờ thanh toán">Chờ thanh toán</option>
@@ -152,7 +161,8 @@
                 <div class="date-group"><label>Ngày ký:</label><input type="date" id="c-signDate"></div>
                 <div class="date-group"><label>Thanh toán:</label><input type="date" id="c-paymentDate"></div>
                 <div class="date-group"><label>Hết hạn:</label><input type="date" id="c-expireDate"></div>
-                <div class="date-group"><label style="color:red">Ngày nhắc:</label><input type="date" id="c-reminderDate"></div>
+                <div class="date-group"><label style="color:red">Ngày nhắc:</label><input type="date"
+                        id="c-reminderDate"></div>
                 <input type="text" id="c-tags" placeholder="Tags">
                 <input type="file" id="c-image">
                 <input type="text" id="c-note" placeholder="Ghi chú" class="span-3">
@@ -168,4 +178,5 @@
 <div id="context-menu">
     <div class="ctx-item" onclick="handleContextAction('edit')">✏️ Sửa</div>
     <div class="ctx-item" onclick="handleContextAction('duplicate')">📋 Nhân bản</div>
+    <div class="ctx-item" onclick="handleContextAction('delete')" style="color:red;">🗑️ Xóa</div>
 </div>

@@ -23,7 +23,7 @@
                 <button onclick="exportFundToExcel()" class="btn-primary-icon" style="background-color: #10b981;">
                     📊 Xuất Excel
                 </button>
-                
+
                 <button onclick="openFundModal()" class="btn-primary-icon">
                     ➕ Thêm Giao Dịch
                 </button>
@@ -31,56 +31,61 @@
         </div>
 
         <div class="table-responsive">
-    <table class="excel-table">
-        <thead>
-            <tr>
-                <th width="5%">STT</th>
-                <th width="12%">Ngày giờ</th>
-                <th width="25%">Nội dung</th>
-                <th width="10%">Tags</th>
-                <th width="12%" style="text-align:right">Thu</th>
-                <th width="12%" style="text-align:right">Chi</th>
-                <th width="14%" style="text-align:right">Số dư</th>
-                <th width="5%" style="text-align:center">Ảnh</th>
-                </tr>
-            
-            <tr class="filter-row">
-                <th></th>
-                <th>
-                    <div class="filter-group-vertical">
-                        <input type="date" id="f-date-start" onchange="filterTransactions()">
-                        <input type="date" id="f-date-end" onchange="filterTransactions()">
-                    </div>
-                </th>
-                <th><input type="text" id="f-title" onkeyup="filterTransactions()" placeholder="Lọc nội dung..."></th>
-                <th><input type="text" id="f-tags" onkeyup="filterTransactions()" placeholder="Lọc tag..."></th>
-                
-                <th>
-                    <input type="text" id="f-min-thu" placeholder=">= Số tiền..." onkeyup="formatCurrencyInput(this); filterTransactions()" style="text-align:right;">
-                </th>
-                <th>
-                    <input type="text" id="f-min-chi" placeholder=">= Số tiền..." onkeyup="formatCurrencyInput(this); filterTransactions()" style="text-align:right;">
-                </th>
+            <table class="excel-table">
+                <thead>
+                    <tr>
+                        <th width="5%">STT</th>
+                        <th width="12%">Ngày giờ</th>
+                        <th width="25%">Nội dung</th>
+                        <th width="10%">Tags</th>
+                        <th width="12%" style="text-align:right">Thu</th>
+                        <th width="12%" style="text-align:right">Chi</th>
+                        <th width="14%" style="text-align:right">Số dư</th>
+                        <th width="5%" style="text-align:center">Ảnh</th>
+                    </tr>
 
-                <th></th> <th></th> </tr>
-        </thead>
-        <tbody id="table-transaction-body">
-            </tbody>
-    </table>
-</div>
+                    <tr class="filter-row">
+                        <th></th>
+                        <th>
+                            <div class="filter-group-vertical">
+                                <input type="date" id="f-date-start" onchange="filterTransactions()">
+                                <input type="date" id="f-date-end" onchange="filterTransactions()">
+                            </div>
+                        </th>
+                        <th><input type="text" id="f-title" onkeyup="filterTransactions()"
+                                placeholder="Lọc nội dung..."></th>
+                        <th><input type="text" id="f-tags" onkeyup="filterTransactions()" placeholder="Lọc tag..."></th>
+
+                        <th>
+                            <input type="text" id="f-min-thu" placeholder=">= Số tiền..."
+                                onkeyup="formatCurrencyInput(this); filterTransactions()" style="text-align:right;">
+                        </th>
+                        <th>
+                            <input type="text" id="f-min-chi" placeholder=">= Số tiền..."
+                                onkeyup="formatCurrencyInput(this); filterTransactions()" style="text-align:right;">
+                        </th>
+
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="table-transaction-body">
+                </tbody>
+            </table>
+        </div>
 
         <div class="pagination-wrapper">
             <div class="rows-per-page">
-                Hiển thị: 
+                Hiển thị:
                 <select id="rows-select-fund" onchange="changeFundRowsPerPage()">
                     <option value="20">20 dòng</option>
                     <option value="50">50 dòng</option>
                     <option value="100">100 dòng</option>
                     <option value="all">Tất cả</option>
                 </select>
-                
+
                 <span style="margin-left: 8px; color: #4b5563; font-size: 13px;">
-                Tổng: <b id="lbl-total-fund" style="color: #2563eb;">0</b> bản ghi
+                    Tổng: <b id="lbl-total-fund" style="color: #2563eb;">0</b> bản ghi
                 </span>
             </div>
 
@@ -90,14 +95,16 @@
 </div>
 
 <div id="modal-transaction" class="modal-overlay">
-    <div class="modal-content" style="max-width: 500px;"> <div class="modal-header">
+    <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-header">
             <h3 id="form-fund-title">Thêm Giao Dịch Mới</h3>
             <span class="close-btn" onclick="closeFundModal()">&times;</span>
         </div>
-        
+
         <div id="form-transaction">
             <input type="hidden" id="t-id">
-            <div class="input-grid" style="grid-template-columns: 1fr;"> <div class="input-group-col">
+            <div class="input-grid" style="grid-template-columns: 1fr;">
+                <div class="input-group-col">
                     <label>Nội dung:</label>
                     <input type="text" id="t-title" placeholder="Ví dụ: Mua văn phòng phẩm">
                 </div>
@@ -105,7 +112,8 @@
                 <div class="input-grid" style="grid-template-columns: 1fr 1fr; gap:10px; margin:0;">
                     <div class="input-group-col">
                         <label>Số tiền:</label>
-                        <input type="text" id="t-amount" placeholder="0" onkeyup="formatCurrencyInput(this)" onkeydown="handleAmountShortcuts(event)" style="font-weight:bold; color:#d63384;">
+                        <input type="text" id="t-amount" placeholder="0" onkeyup="formatCurrencyInput(this)"
+                            onkeydown="handleAmountShortcuts(event)" style="font-weight:bold; color:#d63384;">
                     </div>
                     <div class="input-group-col">
                         <label>Loại:</label>
@@ -125,11 +133,11 @@
                     <label>Đính kèm ảnh:</label>
                     <input type="file" id="t-image">
                 </div>
-                 
-                 <div class="input-group-col">
+
+                <div class="input-group-col">
                     <label>Thời gian (Bỏ trống = Hiện tại):</label>
-                     <input type="datetime-local" id="t-date-custom">
-                 </div>
+                    <input type="datetime-local" id="t-date-custom">
+                </div>
 
             </div>
             <div class="modal-footer">
@@ -140,15 +148,35 @@
     </div>
 </div>
 
-<div id="context-menu-fund" class="context-menu" style="display:none; position:absolute; z-index:1000; background:#fff; box-shadow:0 2px 10px rgba(0,0,0,0.2); border-radius:4px; overflow:hidden;">
-    <div class="ctx-item" onclick="handleFundContextAction('edit')" style="padding:10px 20px; cursor:pointer; font-size:14px;">✏️ Sửa</div>
-    <div class="ctx-item" onclick="handleFundContextAction('duplicate')" style="padding:10px 20px; cursor:pointer; font-size:14px;">📋 Nhân bản</div>
+<div id="context-menu-fund" class="context-menu"
+    style="display:none; position:absolute; z-index:1000; background:#fff; box-shadow:0 2px 10px rgba(0,0,0,0.2); border-radius:4px; overflow:hidden;">
+    <div class="ctx-item" onclick="handleFundContextAction('edit')"
+        style="padding:10px 20px; cursor:pointer; font-size:14px;">✏️ Sửa</div>
+    <div class="ctx-item" onclick="handleFundContextAction('duplicate')"
+        style="padding:10px 20px; cursor:pointer; font-size:14px;">📋 Nhân bản</div>
+    <div class="ctx-item" onclick="handleFundContextAction('delete')" style="color:red;">🗑️ Xóa</div>
 </div>
 
 <style>
     /* CSS bổ sung riêng cho bảng Fund */
-    .col-thu { color: #10b981; font-weight: 600; }
-    .col-chi { color: #ef4444; font-weight: 600; }
-    .col-balance { font-weight: bold; color: #1e293b; }
-    .date-small { font-size: 0.85em; color: #64748b; display:block;}
+    .col-thu {
+        color: #10b981;
+        font-weight: 600;
+    }
+
+    .col-chi {
+        color: #ef4444;
+        font-weight: 600;
+    }
+
+    .col-balance {
+        font-weight: bold;
+        color: #1e293b;
+    }
+
+    .date-small {
+        font-size: 0.85em;
+        color: #64748b;
+        display: block;
+    }
 </style>

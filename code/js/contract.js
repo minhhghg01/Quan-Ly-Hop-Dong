@@ -295,7 +295,7 @@ function renderPagination() {
     container.appendChild(btnNext);
 }
 
-// --- 6. XỬ LÝ CONTEXT MENU (Đã bỏ Xóa) ---
+// --- 6. XỬ LÝ CONTEXT MENU ---
 async function handleContextAction(action) {
     if (!selectedContextId) return;
     const item = globalContracts.find(c => c.id == selectedContextId);
@@ -320,12 +320,46 @@ async function handleContextAction(action) {
         document.getElementById('form-title').innerText = "Nhân bản Hợp đồng";
         document.getElementById('modal-contract').style.display = 'flex';
     }
-
-    // Đã xóa phần else if (action === 'delete') ...
+    // THÊM LẠI PHẦN XỬ LÝ XÓA
+    else if (action === 'delete') {
+        deleteContract(selectedContextId);
+    }
 
     // Ẩn menu sau khi chọn
     const menu = document.getElementById('context-menu');
     if (menu) menu.style.display = 'none';
+}
+
+// --- HÀM XÓA HỢP ĐỒNG (CÓ MẬT KHẨU) ---
+async function deleteContract(id) {
+    // 1. Hỏi xác nhận tránh bấm nhầm
+    if (!confirm("⚠️ Bạn có chắc chắn muốn XÓA VĨNH VIỄN hợp đồng này không?")) return;
+
+    // 2. Hỏi mật khẩu bảo mật
+    const pass = prompt("🔒 BẢO MẬT: Nhập mật khẩu quản trị để XÓA:", "");
+    if (pass === null) return; // Nếu người dùng bấm Hủy
+
+    // Mật khẩu mặc định là 123456 (bạn có thể tự đổi)
+    if (pass !== '123456') {
+        return alert("⛔ Mật khẩu sai! Bạn không có quyền xóa.");
+    }
+
+    // 3. Gọi API để xóa
+    try {
+        const res = await fetch(`${API_URL}/contract/delete`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: id })
+        });
+
+        if (!res.ok) throw new Error("Lỗi kết nối máy chủ");
+
+        showToast("🗑️ Đã xóa hợp đồng thành công!");
+        loadContracts(); // Tải lại bảng ngay lập tức để cập nhật giao diện
+
+    } catch (err) {
+        alert("Lỗi khi xóa: " + err.message);
+    }
 }
 
 // --- 7. CÁC HÀM CŨ (MODAL, CHART, SAVE, FILTER...) ---

@@ -125,7 +125,6 @@ app.post('/api/contract', upload.single('image'), (req, res) => {
 });
 
 // --- API POST HỢP ĐỒNG (CẬP NHẬT / SỬA) ---
-// Logic: Tìm theo ID và ghi đè dữ liệu mới vào
 app.post('/api/contract/update', upload.single('image'), (req, res) => {
     try {
         const {
@@ -167,14 +166,30 @@ app.post('/api/contract/update', upload.single('image'), (req, res) => {
     }
 });
 
+// --- API XÓA HỢP ĐỒNG ---
+app.post('/api/contract/delete', (req, res) => {
+    try {
+        const { id } = req.body;
+        let contracts = JSON.parse(fs.readFileSync(CONTRACT_FILE));
+
+        // Lọc bỏ hợp đồng có ID tương ứng
+        contracts = contracts.filter(c => c.id != id);
+
+        fs.writeFileSync(CONTRACT_FILE, JSON.stringify(contracts, null, 2));
+        res.json({ success: true });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+
 // --- IMPORT THƯ VIỆN EXCEL ---
-// Đảm bảo thư mục report tồn tại
 const REPORT_DIR = path.join(__dirname, 'report');
 if (!fs.existsSync(REPORT_DIR)) {
     fs.mkdirSync(REPORT_DIR);
 }
 
-// --- API XUẤT EXCEL (TÙY BIẾN) ---
+// --- API XUẤT EXCEL HỢP ĐỒNG ---
 app.post('/api/export', async (req, res) => {
     try {
         const contracts = req.body;
@@ -190,7 +205,7 @@ app.post('/api/export', async (req, res) => {
 
         // Style cho ô Tiêu đề (Cột B - Cell 2)
         const cellTitle = rowTotal.getCell(2);
-        cellTitle.font = { bold: true, size: 14, color: { argb: 'FFFF0000' } }; // Chữ đỏ
+        cellTitle.font = { bold: true, size: 14, color: { argb: 'FFFF0000' } };
 
         // Style cho ô Số tiền (Cột C - Cell 3)
         const cellValue = rowTotal.getCell(3);
@@ -207,13 +222,12 @@ app.post('/api/export', async (req, res) => {
             'Ngày ký', 'Thanh toán', 'Hết hạn', 'Trạng thái', 'Ghi chú'
         ]);
 
-        // Style cho Header
         headerRow.font = { bold: true };
         headerRow.eachCell((cell) => {
             cell.fill = {
                 type: 'pattern',
                 pattern: 'solid',
-                fgColor: { argb: 'FFE9ECEF' } // Nền xám
+                fgColor: { argb: 'FFE9ECEF' }
             };
             cell.border = { bottom: { style: 'thin' } };
         });
@@ -235,12 +249,10 @@ app.post('/api/export', async (req, res) => {
         });
 
         // 6. KẺ BẢNG (BORDERS) TỰ ĐỘNG
-        // Lặp từ dòng Header (dòng 4) đến dòng cuối cùng
         const lastRow = worksheet.lastRow.number;
         for (let i = 4; i <= lastRow; i++) {
             const row = worksheet.getRow(i);
             row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
-                // Chỉ kẻ khung cho 10 cột dữ liệu
                 if (colNumber <= 10) {
                     cell.border = {
                         top: { style: 'thin' },
@@ -253,7 +265,7 @@ app.post('/api/export', async (req, res) => {
         }
 
         // 7. ĐỊNH DẠNG ĐỘ RỘNG CỘT
-        worksheet.getColumn(4).numFmt = '#,##0 "đ"'; // Cột Giá trị
+        worksheet.getColumn(4).numFmt = '#,##0 "đ"';
         worksheet.columns = [
             { width: 5 }, { width: 30 }, { width: 25 }, { width: 18 }, { width: 15 },
             { width: 15 }, { width: 15 }, { width: 15 }, { width: 15 }, { width: 20 }
@@ -264,7 +276,6 @@ app.post('/api/export', async (req, res) => {
         const fileName = `HopDong_${String(now.getDate()).padStart(2, '0')}${String(now.getMonth() + 1).padStart(2, '0')}.xlsx`;
 
         res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        // Thêm dấu ngoặc kép quanh biến fileName để đúng chuẩn HTTP
         res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
 
         await workbook.xlsx.write(res);
@@ -276,18 +287,11 @@ app.post('/api/export', async (req, res) => {
     }
 });
 
-// Thêm API xóa (để tính năng chuột phải hoạt động)
-app.post('/api/contract/delete', (req, res) => {
-    // ... Logic xóa ID khỏi database.json (Bạn tự thêm nhé nếu cần) ...
-    // Để demo thì trả về success luôn
-    res.json({ success: true });
-});
-
 // API TẢI FILE (Download)
 app.get('/api/download/:fileName', (req, res) => {
     const filePath = path.join(REPORT_DIR, req.params.fileName);
     if (fs.existsSync(filePath)) {
-        res.download(filePath); // Trình duyệt sẽ tự tải xuống
+        res.download(filePath);
     } else {
         res.status(404).send("File không tồn tại");
     }
@@ -296,7 +300,7 @@ app.get('/api/download/:fileName', (req, res) => {
 // --- API POST SỬA GIAO DỊCH QUỸ ---
 app.post('/api/transaction/update', upload.single('image'), (req, res) => {
     try {
-        const { id, title, amount, type, tags, date } = req.body; // date ở đây là ngày ghi sổ
+        const { id, title, amount, type, tags, date } = req.body;
         let transactions = JSON.parse(fs.readFileSync(DB_FILE));
 
         const index = transactions.findIndex(t => t.id == id);
@@ -305,7 +309,6 @@ app.post('/api/transaction/update', upload.single('image'), (req, res) => {
             transactions[index].amount = Number(amount);
             transactions[index].type = type;
             transactions[index].tags = tags;
-            // Nếu muốn cho sửa ngày thì cập nhật, không thì giữ nguyên
             if (date) transactions[index].date = date;
 
             if (req.file) transactions[index].image = req.file.filename;
@@ -315,6 +318,22 @@ app.post('/api/transaction/update', upload.single('image'), (req, res) => {
         } else {
             res.status(404).json({ success: false, message: "Không tìm thấy giao dịch" });
         }
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+// --- API XÓA GIAO DỊCH QUỸ ---
+app.post('/api/transaction/delete', (req, res) => {
+    try {
+        const { id } = req.body;
+        let transactions = JSON.parse(fs.readFileSync(DB_FILE));
+
+        // Lọc bỏ giao dịch có ID tương ứng
+        transactions = transactions.filter(t => t.id != id);
+
+        fs.writeFileSync(DB_FILE, JSON.stringify(transactions, null, 2));
+        res.json({ success: true });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
@@ -333,9 +352,9 @@ app.post('/api/export-fund', async (req, res) => {
         const balance = totalThu - totalChi;
 
         // 2. HEADER TỔNG HỢP
-        worksheet.addRow(['', 'TỔNG THU:', totalThu]).font = { bold: true, color: { argb: 'FF008000' } }; // Xanh
-        worksheet.addRow(['', 'TỔNG CHI:', totalChi]).font = { bold: true, color: { argb: 'FFFF0000' } }; // Đỏ
-        worksheet.addRow(['', 'TỒN QUỸ:', balance]).font = { bold: true, size: 14, color: { argb: 'FF0000FF' } }; // Xanh dương
+        worksheet.addRow(['', 'TỔNG THU:', totalThu]).font = { bold: true, color: { argb: 'FF008000' } };
+        worksheet.addRow(['', 'TỔNG CHI:', totalChi]).font = { bold: true, color: { argb: 'FFFF0000' } };
+        worksheet.addRow(['', 'TỒN QUỸ:', balance]).font = { bold: true, size: 14, color: { argb: 'FF0000FF' } };
 
         // Format tiền cho các ô tổng
         ['C1', 'C2', 'C3'].forEach(cell => {
@@ -348,7 +367,7 @@ app.post('/api/export-fund', async (req, res) => {
         const headerRow = worksheet.addRow(['STT', 'Nội dung', 'Loại', 'Số tiền', 'Tags', 'Ngày ghi', 'Chứng từ']);
         headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
         headerRow.eachCell(cell => {
-            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF2563EB' } }; // Nền xanh
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF2563EB' } };
             cell.alignment = { horizontal: 'center' };
         });
 
@@ -366,8 +385,8 @@ app.post('/api/export-fund', async (req, res) => {
 
             // Màu chữ cho Thu/Chi
             const color = t.type === 'Thu' ? 'FF008000' : 'FFFF0000';
-            row.getCell(3).font = { bold: true, color: { argb: color } }; // Cột Loại
-            row.getCell(4).font = { bold: true, color: { argb: color } }; // Cột Tiền
+            row.getCell(3).font = { bold: true, color: { argb: color } };
+            row.getCell(4).font = { bold: true, color: { argb: color } };
         });
 
         // 5. FORMAT VÀ BORDER
