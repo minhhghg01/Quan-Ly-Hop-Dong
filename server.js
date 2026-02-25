@@ -130,9 +130,21 @@ app.post('/api/transaction/update', upload.single('image'), (req, res) => {
     try {
         const { id, title, amount, type, tags, date } = req.body;
         let transactions = JSON.parse(fs.readFileSync(DB_FILE));
-
         const index = transactions.findIndex(t => t.id == id);
+
         if (index !== -1) {
+            const oldData = transactions[index];
+            let changes = [];
+
+            // SO SÁNH TỪNG TRƯỜNG ĐỂ LẤY CHI TIẾT SỬA
+            if (oldData.title !== title) changes.push(`Nội dung: ${oldData.title} -> ${title}`);
+            if (oldData.amount !== Number(amount)) changes.push(`Số tiền: ${new Intl.NumberFormat('vi-VN').format(oldData.amount)} -> ${new Intl.NumberFormat('vi-VN').format(Number(amount))}`);
+            if (oldData.type !== type) changes.push(`Loại: ${oldData.type} -> ${type}`);
+            if (oldData.tags !== tags) changes.push(`Tags: ${oldData.tags} -> ${tags}`);
+            if (date && oldData.date !== date) changes.push(`Ngày: ${oldData.date} -> ${date}`);
+            if (req.file) changes.push(`File: Đã cập nhật file ảnh/chứng từ mới`);
+
+            // Ghi đè dữ liệu mới
             transactions[index].title = title;
             transactions[index].amount = Number(amount);
             transactions[index].type = type;
@@ -142,12 +154,13 @@ app.post('/api/transaction/update', upload.single('image'), (req, res) => {
 
             fs.writeFileSync(DB_FILE, JSON.stringify(transactions, null, 2));
 
-            // Ghi log
-            saveLog("Sửa", "Quỹ phòng", `[ID: ${id}] Cập nhật giao dịch -> ${title} (${new Intl.NumberFormat('vi-VN').format(amount)} đ)`, req);
+            // GHI LOG CHI TIẾT
+            let changeLog = changes.length > 0 ? changes.join(" | ") : "Không có thay đổi dữ liệu nào";
+            saveLog("Sửa", "Quỹ phòng", `[ID: ${id}] Sửa: ${changeLog}`, req);
 
             res.json({ success: true });
         } else {
-            res.status(404).json({ success: false, message: "Không tìm thấy giao dịch" });
+            res.status(404).json({ success: false, message: "Không tìm thấy" });
         }
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -160,14 +173,18 @@ app.post('/api/transaction/delete', (req, res) => {
         const { id } = req.body;
         let transactions = JSON.parse(fs.readFileSync(DB_FILE));
 
+        // Tìm lại giao dịch trước khi xóa để lấy thông tin
         const target = transactions.find(t => t.id == id);
         transactions = transactions.filter(t => t.id != id);
 
         fs.writeFileSync(DB_FILE, JSON.stringify(transactions, null, 2));
 
-        // Ghi log
-        const title = target ? target.title : `ID ${id}`;
-        saveLog("Xóa", "Quỹ phòng", `[ID: ${id}] Đã xóa giao dịch -> ${title}`, req);
+        // GHI LOG CÓ SỐ TIỀN
+        const title = target ? target.title : `Không rõ tên`;
+        const typeStr = target && target.type ? target.type.toUpperCase() : "CHƯA RÕ";
+        const amountStr = target ? new Intl.NumberFormat('vi-VN').format(target.amount) : "0";
+
+        saveLog("Xóa", "Quỹ phòng", `[ID: ${id}] Đã xóa [${typeStr}] ${title} - Số tiền: ${amountStr} đ`, req);
 
         res.json({ success: true });
     } catch (error) {
@@ -222,10 +239,26 @@ app.post('/api/contract/update', upload.single('image'), (req, res) => {
     try {
         const { id, title, amount, tags, company, paymentDate, signDate, expireDate, reminderDate, status, note } = req.body;
         let contracts = JSON.parse(fs.readFileSync(CONTRACT_FILE));
-
         const index = contracts.findIndex(c => c.id == id);
 
         if (index !== -1) {
+            const oldData = contracts[index];
+            let changes = [];
+
+            // SO SÁNH TỪNG TRƯỜNG
+            if (oldData.title !== title) changes.push(`Tên HĐ: ${oldData.title} -> ${title}`);
+            if (oldData.company !== company) changes.push(`Công ty: ${oldData.company} -> ${company}`);
+            if (oldData.amount !== Number(amount)) changes.push(`Giá trị: ${new Intl.NumberFormat('vi-VN').format(oldData.amount)} -> ${new Intl.NumberFormat('vi-VN').format(Number(amount))}`);
+            if (oldData.status !== status) changes.push(`Trạng thái: ${oldData.status} -> ${status}`);
+            if (oldData.signDate !== signDate) changes.push(`Ngày ký: ${oldData.signDate} -> ${signDate}`);
+            if (oldData.paymentDate !== paymentDate) changes.push(`Ngày thanh toán: ${oldData.paymentDate} -> ${paymentDate}`);
+            if (oldData.expireDate !== expireDate) changes.push(`Ngày hết hạn: ${oldData.expireDate} -> ${expireDate}`);
+            if ((oldData.reminderDate || '') !== reminderDate) changes.push(`Ngày nhắc: ${oldData.reminderDate || 'Trống'} -> ${reminderDate}`);
+            if (oldData.tags !== tags) changes.push(`Tags: ${oldData.tags} -> ${tags}`);
+            if (oldData.note !== note) changes.push(`Ghi chú: ${oldData.note} -> ${note}`);
+            if (req.file) changes.push(`File đính kèm: Đã tải lên file mới`);
+
+            // Ghi đè dữ liệu mới
             contracts[index].title = title;
             contracts[index].company = company;
             contracts[index].amount = Number(amount);
@@ -240,12 +273,13 @@ app.post('/api/contract/update', upload.single('image'), (req, res) => {
 
             fs.writeFileSync(CONTRACT_FILE, JSON.stringify(contracts, null, 2));
 
-            // Ghi log
-            saveLog("Sửa", "Hợp đồng", `[ID: ${id}] Cập nhật HĐ -> ${title} [Trạng thái: ${status}]`, req);
+            // GHI LOG CHI TIẾT
+            let changeLog = changes.length > 0 ? changes.join(" | ") : "Không có thay đổi dữ liệu nào";
+            saveLog("Sửa", "Hợp đồng", `[ID: ${id}] Sửa: ${changeLog}`, req);
 
             res.json({ success: true });
         } else {
-            res.status(404).json({ success: false, message: "Không tìm thấy hợp đồng" });
+            res.status(404).json({ success: false, message: "Không tìm thấy" });
         }
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -258,14 +292,17 @@ app.post('/api/contract/delete', (req, res) => {
         const { id } = req.body;
         let contracts = JSON.parse(fs.readFileSync(CONTRACT_FILE));
 
+        // Tìm lại hợp đồng trước khi xóa để lấy thông tin
         const target = contracts.find(c => c.id == id);
         contracts = contracts.filter(c => c.id != id);
 
         fs.writeFileSync(CONTRACT_FILE, JSON.stringify(contracts, null, 2));
 
-        // Ghi log
-        const title = target ? target.title : `ID ${id}`;
-        saveLog("Xóa", "Hợp đồng", `[ID: ${id}] Đã xóa HĐ -> ${title}`, req);
+        // GHI LOG CÓ SỐ TIỀN
+        const title = target ? target.title : `Không rõ tên`;
+        const amountStr = target ? new Intl.NumberFormat('vi-VN').format(target.amount) : "0";
+
+        saveLog("Xóa", "Hợp đồng", `[ID: ${id}] Đã xóa HĐ -> ${title} - Giá trị: ${amountStr} đ`, req);
 
         res.json({ success: true });
     } catch (error) {
